@@ -9,35 +9,42 @@ import random
 import numpy as np
 import tkinter
 
+def main():
+    root = tkinter.Tk()
+    root.title("summery movie!")
+    root.geometry("1200x800")
 
-class App():
-    def __init__(self, master=None):
-        self.queryImg = displayImage(self, "/Users/Sobue/Downloads/2.png", 200,200,400,400)
+    root.queryImg = displayImage(root, "/Users/ryou/Documents/SourceTree/movie_summery/1.png", 200,200,400,400)
+    query = tkinter.Label(root, image = root.queryImg)
+    query.pack(padx = 5, pady = 10)
 
-        app.title("summery movie!")
-        app.geometry("1200x800")
-        self.init()
-        self.pack()
-
-
-# class Img():
-    # def __init__(self, filepath):
-        # img_raw = Image.open(filepath)
-        # img_mat = np.array(img_raw, np.float32)
-        # img = PIL.ImageTk.PhotoImage(img_mat)
-        # img = PIL.Image.fromarray(img)
+    root.mainloop()
 
 
-def displayImage(app, filepath, x,y,w,h):
-    # image = Img(filepath)
-    # print(image)
-    canvas = tkinter.Canvas(app, width = w, height = h)
-    img = ImageTk.PhotoImage(file=filepath)
-    canvas.create_image(x, y, image = image)
+def ImageLoader(filepath):
+    img_raw = Image.open(filepath)
+    img_mat = np.array(img_raw, np.float32)
+    img = img_mat.astype(np.uint8)
+    img = PIL.Image.fromarray(img)
+    img = PIL.ImageTk.PhotoImage(img)
+
+    return img
+
+
+def displayImage(root, filepath, x,y,w,h):
+    img = ImageLoader(filepath)
+    canvas = tkinter.Canvas(width = w, height = h)
+    canvas.create_image(x, y, image = img)
     canvas.place(x=x, y=y)
 
 
 if __name__ == '__main__':
-    app = App()
-    app.pack()
-    app.mainloop()
+    main()
+
+#
+# class Img():
+#     def __init__(self, filepath):
+#         img_raw = Image.open(filepath)
+#         img_mat = np.array(img_raw, np.float32)
+#         img = PIL.ImageTk.PhotoImage(img_mat)
+#         img = PIL.Image.fromarray(img)
