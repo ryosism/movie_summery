@@ -1,50 +1,34 @@
-import os
-import sys
-import glob
-import copy
-from PIL import Image
+#! /usr/bin/env python
+
+import tkinter as Tk
 import PIL.Image, PIL.ImageTk
-import pickle
-import random
-import numpy as np
-import tkinter
-
-def main():
-    root = tkinter.Tk()
-    root.title("summery movie!")
-    root.geometry("1200x800")
-
-    root.queryImg = displayImage(root, "/Users/ryou/Documents/SourceTree/movie_summery/1.png", 200,200,400,400)
-    query = tkinter.Label(root, image = root.queryImg)
-    query.pack(padx = 5, pady = 10)
-
-    root.mainloop()
 
 
-def ImageLoader(filepath):
-    img_raw = Image.open(filepath)
-    img_mat = np.array(img_raw, np.float32)
-    img = img_mat.astype(np.uint8)
-    img = PIL.Image.fromarray(img)
-    img = PIL.ImageTk.PhotoImage(img)
+class Frame(Tk.Frame):
+    def __init__(self, filepath, master=None):
+        Tk.Frame.__init__(self, master)
+        self.master.title("summery movie!")
+        self.master.geometry("1200x800")
 
-    return img
+        self.queryImg = []
+        for i, file in enumerate(filepath):
+            image = PIL.Image.open(file)
+            self.queryImg.append(PIL.ImageTk.PhotoImage(image))
 
+            code = "self.query{} = Tk.Label(self, image=self.queryImg[{}])".format(i, i)
+            exec(code)
 
-def displayImage(root, filepath, x,y,w,h):
-    img = ImageLoader(filepath)
-    canvas = tkinter.Canvas(width = w, height = h)
-    canvas.create_image(x, y, image = img)
-    canvas.place(x=x, y=y)
+            code = "self.query{}.pack(padx = 10, pady = 10, anchor = Tk.NW)".format(i)
+            exec(code)
 
 
 if __name__ == '__main__':
-    main()
+    filepath = [
+        '/Users/ryou/Documents/SourceTree/movie_summery/1.png',
+        '/Users/ryou/Documents/SourceTree/movie_summery/2.png',
+        '/Users/ryou/Documents/SourceTree/movie_summery/3.png',
+        '/Users/ryou/Documents/SourceTree/movie_summery/4.png']
 
-#
-# class Img():
-#     def __init__(self, filepath):
-#         img_raw = Image.open(filepath)
-#         img_mat = np.array(img_raw, np.float32)
-#         img = PIL.ImageTk.PhotoImage(img_mat)
-#         img = PIL.Image.fromarray(img)
+    f = Frame(filepath)
+    f.pack(anchor = Tk.NW)
+    f.mainloop()
