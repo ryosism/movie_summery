@@ -2,17 +2,18 @@
 
 import tkinter as Tk
 import PIL.Image, PIL.ImageTk
+import json
 
 
 class Frame(Tk.Frame):
-    def __init__(self, filepath, master=None):
+    def __init__(self, queryPath, candidatePath, master=None):
         Tk.Frame.__init__(self, master)
         self.master.title("summery movie!")
         self.master.geometry("1200x800")
 
         #クエリ画像表示
         self.queryImg = []
-        for row, file in enumerate(filepath):
+        for row, file in enumerate(queryPath):
             image = PIL.Image.open(file)
             self.queryImg.append(PIL.ImageTk.PhotoImage(image))
             code = "self.query{} = Tk.Label(self, image=self.queryImg[{}])".format(row, row)
@@ -21,31 +22,29 @@ class Frame(Tk.Frame):
             exec(code)
 
             #クエリごとのTop5表示
-            for column, candidate in enumerate(selectedTop5[]):
+            for column, candidate in enumerate(candidatePath[row]):
                 image = PIL.Image.open(candidate)
                 self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
-                code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(column, column)
+                code = "self.candidate{} = Tk.Button(self, image=self.candidateImg[{}])".format(column, column)
                 exec(code)
                 code = "self.candidate{}.grid(row={}, column={}, padx = 10, pady = 10)".format(column, row, column)
                 exec(code)
 
 
 if __name__ == '__main__':
-    filepath = [
-        '/Users/ryou/Documents/SourceTree/movie_summery/1.png',
-        '/Users/ryou/Documents/SourceTree/movie_summery/2.png',
-        '/Users/ryou/Documents/SourceTree/movie_summery/3.png',
-        '/Users/ryou/Documents/SourceTree/movie_summery/4.png']
+    with open("query.json", "r") as file:
+        queryPath = json.load(file)
 
-    selectedTop5 = [
-        [
+    with open("candidate.json", "r") as file:
+        candidatePath = json.load(file)
+        # -----------------------------
+        # -----------------------------
+        epoch = 20
+        candidatePath = candidatePath[epoch]
+        # -----------------------------
+        # -----------------------------
 
-        ],
-        [
-
-        ]
-    ]
-    f = Frame(filepath)
+    f = Frame(queryPath, candidatePath)
     f.pack(anchor = Tk.NW)
     f.mainloop()
 
