@@ -1,8 +1,10 @@
 #! /usr/bin/env python
 
 import tkinter as Tk
-import PIL.Image, PIL.ImageTk
+import PIL.Image
+import PIL.ImageTk
 import json
+import sys
 
 
 class Frame(Tk.Frame):
@@ -11,9 +13,11 @@ class Frame(Tk.Frame):
         self.master.title("summery movie!")
         self.master.geometry("1200x800")
 
+        self.candidateImg = []
+
         #クエリ画像表示
         self.queryImg = []
-        for row, file in enumerate(queryPath):
+        for row, file in zip(range(len(queryPath)), queryPath):
             image = PIL.Image.open(file)
             self.queryImg.append(PIL.ImageTk.PhotoImage(image))
             code = "self.query{} = Tk.Label(self, image=self.queryImg[{}])".format(row, row)
@@ -21,13 +25,16 @@ class Frame(Tk.Frame):
             code = "self.query{}.grid(row={}, column=0, padx = 10, pady = 10)".format(row, row)
             exec(code)
 
-            #クエリごとのTop5表示
+        #クエリごとのTop5表示
+        self.candidateImg = []
+        for row in range(len(candidatePath)):
             for column, candidate in enumerate(candidatePath[row]):
                 image = PIL.Image.open(candidate)
+                image = image.resize([320, 180], resample=0)
                 self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
-                code = "self.candidate{} = Tk.Button(self, image=self.candidateImg[{}])".format(column, column)
+                code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(column, column)
                 exec(code)
-                code = "self.candidate{}.grid(row={}, column={}, padx = 10, pady = 10)".format(column, row, column)
+                code = "self.candidate{}.grid(row={}, column={}, padx = 10, pady = 10)".format(column, row, column+1)
                 exec(code)
 
 
@@ -39,7 +46,7 @@ if __name__ == '__main__':
         candidatePath = json.load(file)
         # -----------------------------
         # -----------------------------
-        epoch = 20
+        epoch = 1
         candidatePath = candidatePath[epoch]
         # -----------------------------
         # -----------------------------
