@@ -19,6 +19,7 @@ class Frame(Tk.Frame):
         self.queryImg = []
         for row, file in zip(range(len(queryPath)), queryPath):
             image = PIL.Image.open(file)
+            # image = image.resize([224, 224], resample=0)
             self.queryImg.append(PIL.ImageTk.PhotoImage(image))
             code = "self.query{} = Tk.Label(self, image=self.queryImg[{}])".format(row, row)
             exec(code)
@@ -30,7 +31,7 @@ class Frame(Tk.Frame):
         for row in range(len(candidatePath)):
             for column, candidate in enumerate(candidatePath[row]):
                 image = PIL.Image.open(candidate)
-                image = image.resize([320, 180], resample=0)
+                image = image.resize([224, 126], resample=1)
                 self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
                 code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(column, column)
                 exec(code)
