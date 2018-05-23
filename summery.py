@@ -11,8 +11,8 @@ class QueryFrame(Tk.Frame):
     def __init__(self, row, query, candidate, master=None):
         Tk.Frame.__init__(self, master)
 
-        frame = Tk.LabelFrame(self, bd=2, relief="ridge", text="query {}".format(row))
-        frame.pack(fill="x")
+        self = Tk.LabelFrame(self, bd=2, relief="ridge", text="query {}".format(row))
+        self.pack(fill="x")
 
         self.query = query
         self.image = PIL.Image.open(self.query)
