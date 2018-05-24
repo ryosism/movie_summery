@@ -38,6 +38,7 @@ class MainFrame(Tk.Frame):
         self.master.title("summery movie!")
         self.master.geometry("1500x1000")
 
+
         self.canvas = Tk.Canvas(self, scrollregion=("0c", "0c",  "40c",  "40c"), width="10c", height="10c")
         self.canvas.create_window(0, 0, window = self)
         yScrollbar = Tk.Scrollbar(self.master, orient=Tk.VERTICAL, command=self.canvas.yview)
@@ -49,9 +50,11 @@ class MainFrame(Tk.Frame):
 
         for row in range(len(queryPath)):
             code = "self.queryFrame{} = QueryFrame(row, queryPath[row], candidatePath[row])".format(row)
+
             exec(code)
             code = "self.queryFrame{}.pack(anchor = Tk.NW)".format(row)
             exec(code)
+
 
         self.grid_rowconfigure(0, weight=1, minsize=0)
         self.grid_columnconfigure(0, weight=1, minsize=0)
@@ -82,6 +85,7 @@ class MainFrame(Tk.Frame):
         #         exec(code)
         #         code = "self.candidate{}.grid(row={}, column={}, padx = 10, pady = 10)".format(column, row, column+1)
         #         exec(code)
+
 
 
 if __name__ == '__main__':
