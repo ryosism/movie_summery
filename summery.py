@@ -1,40 +1,91 @@
 #! /usr/bin/env python
 
 import tkinter as Tk
+import tkinter.ttk as ttk
 import PIL.Image
 import PIL.ImageTk
 import json
 import sys
 
 
-class Frame(Tk.Frame):
+class QueryFrame(Tk.Frame):
+    def __init__(self, row, query, candidate, master=None):
+        Tk.Frame.__init__(self, master)
+
+        self = Tk.LabelFrame(self, bd=2, relief="ridge", text="query {}".format(row+1))
+        self.pack(fill="x", padx=5, pady=5)
+
+        self.query = query
+        self.image = PIL.Image.open(self.query)
+        self.queryImg = (PIL.ImageTk.PhotoImage(self.image))
+        self.query = Tk.Label(self, image=self.queryImg)
+        self.query.pack(side = 'left', padx = 10, pady = 10)
+
+        self.candidateImg = []
+        for i, file in enumerate(candidate):
+            image = PIL.Image.open(file)
+            image = image.resize([224, 126], resample=1)
+            self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
+            code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(i, i)
+            exec(code)
+            code = "self.candidate{}.pack(side = 'left', padx = 10, pady = 10)".format(i)
+            exec(code)
+
+
+class MainFrame(Tk.Frame):
     def __init__(self, queryPath, candidatePath, master=None):
         Tk.Frame.__init__(self, master)
         self.master.title("summery movie!")
-        self.master.geometry("1200x800")
+        self.master.geometry("1500x1000")
 
-        #クエリ画像表示
-        self.queryImg = []
-        for row, file in zip(range(len(queryPath)), queryPath):
-            image = PIL.Image.open(file)
-            # image = image.resize([224, 224], resample=0)
-            self.queryImg.append(PIL.ImageTk.PhotoImage(image))
-            code = "self.query{} = Tk.Label(self, image=self.queryImg[{}])".format(row, row)
+
+        self.canvas = Tk.Canvas(self, scrollregion=("0c", "0c",  "40c",  "40c"), width="10c", height="10c")
+        self.canvas.create_window(0, 0, window = self)
+        yScrollbar = Tk.Scrollbar(self.master, orient=Tk.VERTICAL, command=self.canvas.yview)
+        yScrollbar.pack(side=Tk.RIGHT, fill=Tk.Y)
+        self.canvas.grid(row=0, column=0)
+        # yScrollbar.grid(row=0, column=1, sticky=Tk.N+Tk.S)
+        self.canvas.configure(yscrollcommand = yScrollbar.set)
+
+
+        for row in range(len(queryPath)):
+            code = "self.queryFrame{} = QueryFrame(row, queryPath[row], candidatePath[row])".format(row)
+
             exec(code)
-            code = "self.query{}.grid(row={}, column=0, padx = 10, pady = 10)".format(row, row)
+            code = "self.queryFrame{}.pack(anchor = Tk.NW)".format(row)
             exec(code)
 
-        #クエリごとのTop5表示
-        self.candidateImg = []
-        for row in range(len(candidatePath)):
-            for column, candidate in enumerate(candidatePath[row]):
-                image = PIL.Image.open(candidate)
-                image = image.resize([224, 126], resample=1)
-                self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
-                code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(column, column)
-                exec(code)
-                code = "self.candidate{}.grid(row={}, column={}, padx = 10, pady = 10)".format(column, row, column+1)
-                exec(code)
+
+        self.grid_rowconfigure(0, weight=1, minsize=0)
+        self.grid_columnconfigure(0, weight=1, minsize=0)
+
+
+        # self.canvas.pack()
+        # self.pack()
+
+        # #クエリ画像表示
+        # self.queryImg = []
+        # for row, file in zip(range(len(queryPath)), queryPath):
+        #     image = PIL.Image.open(file)
+        #     # image = image.resize([224, 224], resample=0)
+        #     self.queryImg.append(PIL.ImageTk.PhotoImage(image))
+        #     code = "self.query{} = Tk.Label(self, image=self.queryImg[{}])".format(row, row)
+        #     exec(code)
+        #     code = "self.query{}.grid(row={}, column=0, padx = 10, pady = 10)".format(row, row)
+        #     exec(code)
+        #
+        # #クエリごとのTop5表示
+        # self.candidateImg = []
+        # for row in range(len(candidatePath)):
+        #     for column, candidate in enumerate(candidatePath[row]):
+        #         image = PIL.Image.open(candidate)
+        #         image = image.resize([224, 126], resample=1)
+        #         self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
+        #         code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(column, column)
+        #         exec(code)
+        #         code = "self.candidate{}.grid(row={}, column={}, padx = 10, pady = 10)".format(column, row, column+1)
+        #         exec(code)
+
 
 
 if __name__ == '__main__':
@@ -50,9 +101,13 @@ if __name__ == '__main__':
         # -----------------------------
         # -----------------------------
 
-    f = Frame(queryPath, candidatePath)
-    f.pack(anchor = Tk.NW)
-    f.mainloop()
+    mainFrame = MainFrame(queryPath, candidatePath)
+
+
+
+    # mainFrame.canvas.pack()
+    mainFrame.pack()
+    mainFrame.mainloop()
 
 
 # epochごとの推論のログはここで読み込ませたいから、
