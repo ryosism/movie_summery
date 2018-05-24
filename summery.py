@@ -18,6 +18,10 @@ class QueryFrame(Tk.Frame):
             print(allRadioButtonResults)
 
 
+        def loadMore():
+            print("loadMore")
+            
+
         Tk.Frame.__init__(self, master)
         self = Tk.LabelFrame(self, bd=2, relief="ridge", text="query {}".format(row+1))
         self.pack(fill="x", padx=5, pady=5)
@@ -31,8 +35,8 @@ class QueryFrame(Tk.Frame):
         v = Tk.IntVar()
         v.set(0)
         self.candidateImg = []
-        for i, file in enumerate(candidate):
-            image = PIL.Image.open(file)
+        for i in range(5):
+            image = PIL.Image.open(candidate[i])
             image = image.resize([224, 126], resample=1)
             self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
             code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(i, i)
@@ -43,6 +47,13 @@ class QueryFrame(Tk.Frame):
             exec(code)
             code = "self.radio{}.grid(row=2, column = {}, sticky=Tk.N + Tk.S)".format(i, i+1)
             exec(code)
+
+        self.queryNum = row
+        code = "self.reloadButton{} = Tk.Button(self, text = '次の候補を表示', command = loadMore)".format(i)
+        exec(code)
+        code = "self.reloadButton{}.grid(row = 1, column = 6, padx = 10, pady = 10)".format(i)
+        exec(code)
+
 
 
 class MainFrame(Tk.Frame):
@@ -67,7 +78,7 @@ class MainFrame(Tk.Frame):
                 output = ffmpeg.output(self.stream, "clopMovie_{}.mp4".format(row+1), t = 20, ss = int(timeSecond)-10)
                 ffmpeg.run(output)
 
-                cmd = "ffmpeg -y -ss {} -i {} -t {} clopMovie_{}.mp4".format(
+                cmd = "ffmpeg -hide_banner -y -ss {} -i {} -t {} clopMovie_{}.mp4".format(
                     (int(timeSecond)/30)-5,
                     "/Users/Sobue/Downloads/YummyFTP/RakutenDS/Hamburg_mitsuru_2018-01-08.mp4",
                     10,
@@ -77,9 +88,8 @@ class MainFrame(Tk.Frame):
                 sp.call(cmd, shell = True)
 
             f.close()
-            cmd = "ffmpeg -y -f concat -i concat.txt -c copy summerizedMovie.mp4"
+            cmd = "ffmpeg -hide_banner -y -f concat -i concat.txt -c copy summerizedMovie.mp4"
             sp.call(cmd, shell = True)
-            print("done!")
             messagebox.showinfo("summery movie!", "Done!")
 
 
@@ -141,8 +151,8 @@ if __name__ == '__main__':
         candidatePath = candidatePath[epoch]
         # -----------------------------
         # -----------------------------
-    if os.path.exists("*.mp4"):
-        os.remove("*.mp4")
+    if os.path.exists("./*.mp4"):
+        os.remove("./*.mp4")
     if os.path.exists("concat.txt"):
         os.remove("concat.txt")
     mainFrame = MainFrame(queryPath, candidatePath)
