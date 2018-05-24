@@ -20,23 +20,37 @@ class QueryFrame(Tk.Frame):
 
         def loadMore():
             print("loadMore")
-            
+            unusedArray = self.candidate[0:5]
+            del self.candidate[0:5]
+            self.candidate += unusedArray
+
+            for i in range(5):
+                image = PIL.Image.open(self.candidate[i])
+                image = image.resize([224, 126], resample=1)
+                self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
+                code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(i, i)
+                exec(code)
+                code = "self.candidate{}.grid(row = 1, column = {}, padx = 10, pady = 10)".format(i, i+1)
+                exec(code)
+
 
         Tk.Frame.__init__(self, master)
+
         self = Tk.LabelFrame(self, bd=2, relief="ridge", text="query {}".format(row+1))
         self.pack(fill="x", padx=5, pady=5)
         self.image = PIL.Image.open(query)
         self.image.thumbnail((120, 120), PIL.Image.ANTIALIAS)
         self.queryImg = (PIL.ImageTk.PhotoImage(self.image))
         self.query = Tk.Label(self, image=self.queryImg)
-        # self.query.pack(side = 'left', padx = 10, pady = 10)
         self.query.grid(row = 1, column = 0, padx = 10, pady = 10)
+
+        self.candidate = candidate
 
         v = Tk.IntVar()
         v.set(0)
         self.candidateImg = []
         for i in range(5):
-            image = PIL.Image.open(candidate[i])
+            image = PIL.Image.open(self.candidate[i])
             image = image.resize([224, 126], resample=1)
             self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
             code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(i, i)
@@ -48,7 +62,6 @@ class QueryFrame(Tk.Frame):
             code = "self.radio{}.grid(row=2, column = {}, sticky=Tk.N + Tk.S)".format(i, i+1)
             exec(code)
 
-        self.queryNum = row
         code = "self.reloadButton{} = Tk.Button(self, text = '次の候補を表示', command = loadMore)".format(i)
         exec(code)
         code = "self.reloadButton{}.grid(row = 1, column = 6, padx = 10, pady = 10)".format(i)
