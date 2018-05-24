@@ -9,18 +9,27 @@ import sys
 
 
 class QueryFrame(Tk.Frame):
-    def __init__(self, row, query, candidate, master=None):
+
+
+    def __init__(self, row, query, candidate, allRadioButtonResults, master=None):
         Tk.Frame.__init__(self, master)
 
         self = Tk.LabelFrame(self, bd=2, relief="ridge", text="query {}".format(row+1))
-        self.pack(fill="x", padx=5, pady=5)
+        # self.pack(fill="x", padx=5, pady=5)
+        self.grid(padx=5, pady=5)
 
-        self.query = query
-        self.image = PIL.Image.open(self.query)
+        self.image = PIL.Image.open(query)
         self.queryImg = (PIL.ImageTk.PhotoImage(self.image))
         self.query = Tk.Label(self, image=self.queryImg)
-        self.query.pack(side = 'left', padx = 10, pady = 10)
+        # self.query.pack(side = 'left', padx = 10, pady = 10)
+        self.query.grid(row = 0, column = 0, padx = 10, pady = 10)
 
+        def change_state():
+            allRadioButtonResults[row] = v.get() #候補にしたTop番号がここに入る
+
+
+        v = Tk.IntVar()
+        v.set(0)
         self.candidateImg = []
         for i, file in enumerate(candidate):
             image = PIL.Image.open(file)
@@ -28,8 +37,13 @@ class QueryFrame(Tk.Frame):
             self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
             code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(i, i)
             exec(code)
-            code = "self.candidate{}.pack(side = 'left', padx = 10, pady = 10)".format(i)
+            code = "self.candidate{}.grid(row = 0, column = {}, padx = 10, pady = 10)".format(i, i+1)
             exec(code)
+            code = "radio{} = Tk.Radiobutton(text = '候補', variable = v, value = {}, command = change_state); radio{}.pack(side = 'left')".format(i, i, i)
+            exec(code)
+
+
+
 
 
 class MainFrame(Tk.Frame):
@@ -37,7 +51,9 @@ class MainFrame(Tk.Frame):
         Tk.Frame.__init__(self, master)
         self.master.title("summery movie!")
         self.master.geometry("1500x1000")
-
+        self.allRadioButtonResults = []
+        for i in range(len(candidatePath)):
+            self.allRadioButtonResults.append(0)
 
         self.canvas = Tk.Canvas(self, scrollregion=("0c", "0c",  "40c",  "40c"), width="10c", height="10c")
         self.canvas.create_window(0, 0, window = self)
@@ -47,14 +63,11 @@ class MainFrame(Tk.Frame):
         # yScrollbar.grid(row=0, column=1, sticky=Tk.N+Tk.S)
         self.canvas.configure(yscrollcommand = yScrollbar.set)
 
-
         for row in range(len(queryPath)):
-            code = "self.queryFrame{} = QueryFrame(row, queryPath[row], candidatePath[row])".format(row)
-
+            code = "self.queryFrame{} = QueryFrame(row, queryPath[row], candidatePath[row], self.allRadioButtonResults)".format(row)
             exec(code)
             code = "self.queryFrame{}.pack(anchor = Tk.NW)".format(row)
             exec(code)
-
 
         self.grid_rowconfigure(0, weight=1, minsize=0)
         self.grid_columnconfigure(0, weight=1, minsize=0)
@@ -87,7 +100,6 @@ class MainFrame(Tk.Frame):
         #         exec(code)
 
 
-
 if __name__ == '__main__':
     with open("query.json", "r") as file:
         queryPath = json.load(file)
@@ -102,8 +114,6 @@ if __name__ == '__main__':
         # -----------------------------
 
     mainFrame = MainFrame(queryPath, candidatePath)
-
-
 
     # mainFrame.canvas.pack()
     mainFrame.pack()
