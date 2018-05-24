@@ -12,21 +12,22 @@ class QueryFrame(Tk.Frame):
 
 
     def __init__(self, row, query, candidate, allRadioButtonResults, master=None):
+        def change_state():
+            allRadioButtonResults[row] = v.get() #候補にしたTop番号がここに入る
+            print(allRadioButtonResults)
+
+
         Tk.Frame.__init__(self, master)
 
         self = Tk.LabelFrame(self, bd=2, relief="ridge", text="query {}".format(row+1))
-        # self.pack(fill="x", padx=5, pady=5)
-        self.grid(padx=5, pady=5)
+        self.pack(fill="x", padx=5, pady=5)
+        # self.grid(padx=5, pady=5)
 
         self.image = PIL.Image.open(query)
         self.queryImg = (PIL.ImageTk.PhotoImage(self.image))
         self.query = Tk.Label(self, image=self.queryImg)
         # self.query.pack(side = 'left', padx = 10, pady = 10)
-        self.query.grid(row = 0, column = 0, padx = 10, pady = 10)
-
-        def change_state():
-            allRadioButtonResults[row] = v.get() #候補にしたTop番号がここに入る
-
+        self.query.grid(row = 1, column = 0, padx = 10, pady = 10)
 
         v = Tk.IntVar()
         v.set(0)
@@ -37,13 +38,13 @@ class QueryFrame(Tk.Frame):
             self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
             code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(i, i)
             exec(code)
-            code = "self.candidate{}.grid(row = 0, column = {}, padx = 10, pady = 10)".format(i, i+1)
+            code = "self.candidate{}.grid(row = 1, column = {}, padx = 10, pady = 10)".format(i, i+1)
             exec(code)
-            code = "radio{} = Tk.Radiobutton(text = '候補', variable = v, value = {}, command = change_state); radio{}.pack(side = 'left')".format(i, i, i)
+            code = "self.radio{} = Tk.Radiobutton(self, text = '候補にする', variable = v, value = {}, command = change_state)".format(i, i)
             exec(code)
-
-
-
+            # code = "self.radio{}.pack(padx = 10, pady = 10, anchor = Tk.NW)".format(i, i+1)
+            code = "self.radio{}.grid(row=2, column = {})".format(i, i+1)
+            exec(code)
 
 
 class MainFrame(Tk.Frame):
@@ -60,7 +61,6 @@ class MainFrame(Tk.Frame):
         yScrollbar = Tk.Scrollbar(self.master, orient=Tk.VERTICAL, command=self.canvas.yview)
         yScrollbar.pack(side=Tk.RIGHT, fill=Tk.Y)
         self.canvas.grid(row=0, column=0)
-        # yScrollbar.grid(row=0, column=1, sticky=Tk.N+Tk.S)
         self.canvas.configure(yscrollcommand = yScrollbar.set)
 
         for row in range(len(queryPath)):
@@ -71,7 +71,6 @@ class MainFrame(Tk.Frame):
 
         self.grid_rowconfigure(0, weight=1, minsize=0)
         self.grid_columnconfigure(0, weight=1, minsize=0)
-
 
         # self.canvas.pack()
         # self.pack()
