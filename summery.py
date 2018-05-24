@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 import tkinter as Tk
+import tkinter.ttk as ttk
 import PIL.Image
 import PIL.ImageTk
 import json
@@ -11,8 +12,8 @@ class QueryFrame(Tk.Frame):
     def __init__(self, row, query, candidate, master=None):
         Tk.Frame.__init__(self, master)
 
-        self = Tk.LabelFrame(self, bd=2, relief="ridge", text="query {}".format(row))
-        self.pack(fill="x")
+        self = Tk.LabelFrame(self, bd=2, relief="ridge", text="query {}".format(row+1))
+        self.pack(fill="x", padx=5, pady=5)
 
         self.query = query
         self.image = PIL.Image.open(self.query)
@@ -31,17 +32,33 @@ class QueryFrame(Tk.Frame):
             exec(code)
 
 
-class Frame(Tk.Frame):
+class MainFrame(Tk.Frame):
     def __init__(self, queryPath, candidatePath, master=None):
         Tk.Frame.__init__(self, master)
         self.master.title("summery movie!")
         self.master.geometry("1500x1000")
+
+        self.canvas = Tk.Canvas(self, scrollregion=("0c", "0c",  "40c",  "40c"), width="10c", height="10c")
+        self.canvas.create_window(0, 0, window = self)
+        yScrollbar = Tk.Scrollbar(self.master, orient=Tk.VERTICAL, command=self.canvas.yview)
+        yScrollbar.pack(side=Tk.RIGHT, fill=Tk.Y)
+        self.canvas.grid(row=0, column=0)
+        # yScrollbar.grid(row=0, column=1, sticky=Tk.N+Tk.S)
+        self.canvas.configure(yscrollcommand = yScrollbar.set)
+
 
         for row in range(len(queryPath)):
             code = "self.queryFrame{} = QueryFrame(row, queryPath[row], candidatePath[row])".format(row)
             exec(code)
             code = "self.queryFrame{}.pack(anchor = Tk.NW)".format(row)
             exec(code)
+
+        self.grid_rowconfigure(0, weight=1, minsize=0)
+        self.grid_columnconfigure(0, weight=1, minsize=0)
+
+
+        # self.canvas.pack()
+        # self.pack()
 
         # #クエリ画像表示
         # self.queryImg = []
@@ -80,9 +97,13 @@ if __name__ == '__main__':
         # -----------------------------
         # -----------------------------
 
-    f = Frame(queryPath, candidatePath)
-    f.pack(anchor = Tk.NW)
-    f.mainloop()
+    mainFrame = MainFrame(queryPath, candidatePath)
+
+
+
+    # mainFrame.canvas.pack()
+    mainFrame.pack()
+    mainFrame.mainloop()
 
 
 # epochごとの推論のログはここで読み込ませたいから、
