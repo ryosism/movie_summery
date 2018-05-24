@@ -1,11 +1,14 @@
 #! /usr/bin/env python
 
 import tkinter as Tk
-import tkinter.ttk as ttk
+from tkinter import messagebox
 import PIL.Image
 import PIL.ImageTk
 import json
-import sys
+import sys, os
+import ffmpeg
+
+import subprocess as sp
 
 
 class QueryFrame(Tk.Frame):
@@ -49,8 +52,41 @@ class MainFrame(Tk.Frame):
     #     self.canvas.config(scrollregion=self.canvas.bbox('all'))
 
     def __init__(self, queryPath, candidatePath, master=None):
+        def doSummery():
+            print("summerizing... by",self.allRadioButtonResults)
+            timeSeconds = []
+            movieClips = []
+            f = open("concat.txt", "w")
+
+            for row in range(len(queryPath)):
+                filePath = candidatePath[row][self.allRadioButtonResults[row]]
+                fileName = filePath.split('/')[-1]
+                timeSecond, ext = os.path.splitext(fileName)
+                timeSeconds.append(timeSecond)
+                cropMoviename = "clopMovie_{}.mp4".format(row+1)
+                output = ffmpeg.output(self.stream, "clopMovie_{}.mp4".format(row+1), t = 20, ss = int(timeSecond)-10)
+                ffmpeg.run(output)
+
+                cmd = "ffmpeg -y -ss {} -i {} -t {} clopMovie_{}.mp4".format(
+                    (int(timeSecond)/30)-5,
+                    "/Users/Sobue/Downloads/YummyFTP/RakutenDS/Hamburg_mitsuru_2018-01-08.mp4",
+                    10,
+                    row+1
+                    )
+                f.write("file " + cropMoviename + "\n")
+                sp.call(cmd, shell = True)
+
+            f.close()
+            cmd = "ffmpeg -y -f concat -i concat.txt -c copy summerizedMovie.mp4"
+            sp.call(cmd, shell = True)
+            print("done!")
+            messagebox.showinfo("summery movie!", "Done!")
+
+
         Tk.Frame.__init__(self, master)
         self.master.title("summery movie!")
+        self.stream = ffmpeg.input('/Users/Sobue/Downloads/YummyFTP/RakutenDS/Hamburg_mitsuru_2018-01-08.mp4')
+
         self.allRadioButtonResults = []
         for i in range(len(candidatePath)):
             self.allRadioButtonResults.append(0)
@@ -89,7 +125,9 @@ class MainFrame(Tk.Frame):
         self.grid_rowconfigure(0, weight=1, minsize=0)
         self.grid_columnconfigure(0, weight=1, minsize=0)
 
-        summeryButton = Tk.Button
+        self.summeryButton = Tk.Button(self, text = "このキーフレームで動画要約開始", command = doSummery, padx = 10, pady = 10)
+        self.summeryButton.pack(side="bottom")
+
 
 if __name__ == '__main__':
     with open("query_112.json", "r") as file:
