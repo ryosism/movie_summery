@@ -137,13 +137,13 @@ if __name__ == '__main__':
         candidatePath = json.load(file)
         # -----------------------------
         # -----------------------------
-        epoch = 20
+        epoch = 15
         candidatePath = candidatePath[epoch]
         # -----------------------------
         # -----------------------------
 
+    os.remove("*.mp4")
+    os.remove("concat.txt")
     mainFrame = MainFrame(queryPath, candidatePath)
-
-    # mainFrame.canvas.pack()
     mainFrame.pack()
     mainFrame.mainloop()
