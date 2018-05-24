@@ -137,6 +137,7 @@ if __name__ == '__main__':
         candidatePath = json.load(file)
         # -----------------------------
         # -----------------------------
+<<<<<<< HEAD
         epoch = int(sys.argv[1])
         candidatePath = candidatePath[epoch]
         # -----------------------------
@@ -145,6 +146,15 @@ if __name__ == '__main__':
         os.remove("*.mp4")
     if os.path.exists("concat.txt"):
         os.remove("concat.txt")
+=======
+        epoch = 15
+        candidatePath = candidatePath[epoch]
+        # -----------------------------
+        # -----------------------------
+
+    os.remove("*.mp4")
+    os.remove("concat.txt")
+>>>>>>> 21b5d96a94364132cae3089c889828ff4a26d825
     mainFrame = MainFrame(queryPath, candidatePath)
     mainFrame.pack()
     mainFrame.mainloop()
