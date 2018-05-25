@@ -104,8 +104,8 @@ class MainFrame(Tk.Frame):
                 output = ffmpeg.output(self.stream, "clopMovie_{}.mp4".format(row+1), t = 20, ss = int(timeSecond)-10)
                 ffmpeg.run(output)
 
-                cmd = "ffmpeg -hide_banner -y -ss {} -i {} -t {} clopMovie_{}.mp4".format(
-                    (int(timeSecond)/30)-5, "/Users/Sobue/Downloads/YummyFTP/RakutenDS/Hamburg_mitsuru_2018-01-08.mp4", 10, row+1)
+                cmd = "ffmpeg -hide_banner -y -vf setpts=PTS/2.0 -af atempo=2.0 -ss {} -i {} -t {} clopMovie_{}.mp4".format(
+                    (int(timeSecond)/30)-5, "/Users/Sobue/Downloads/YummyFTP/RakutenDS/Hamburg_mitsuru_2018-01-08.mp4", 20, row+1)
                 f.write("file " + cropMoviename + "\n")
                 sp.call(cmd, shell = True)
 
@@ -177,8 +177,8 @@ if __name__ == '__main__':
         candidatePath = candidatePath[epoch]
         # -----------------------------
         # -----------------------------
-    if os.path.exists("./*.mp4"):
-        os.remove("./*.mp4")
+    if os.path.exists("*.mp4"):
+        os.remove("*.mp4")
     if os.path.exists("concat.txt"):
         os.remove("concat.txt")
     mainFrame = MainFrame(queryPath, candidatePath)
