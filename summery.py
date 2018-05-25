@@ -7,15 +7,37 @@ import PIL.ImageTk
 import json
 import sys, os
 import ffmpeg
-
 import subprocess as sp
 
 
 class QueryFrame(Tk.Frame):
-    def __init__(self, row, query, candidate, allRadioButtonResults, master=None):
+    def __init__(self, row, query, candidate, allRadioButtonResults, allTextBoxStrings, master=None):
         def change_state():
             allRadioButtonResults[row] = v.get() #候補にしたTop番号がここに入る
             print(allRadioButtonResults)
+
+
+        def loadMore():
+            print("loadMore")
+            unusedArray = self.candidate[0:5]
+            del self.candidate[0:5]
+            self.candidate += unusedArray
+
+            for i in range(5):
+                image = PIL.Image.open(self.candidate[i])
+                image = image.resize([224, 126], resample=1)
+                self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
+                code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(i, i)
+                exec(code)
+                code = "self.candidate{}.grid(row = 1, column = {}, padx = 10, pady = 10)".format(i, i+1)
+                exec(code)
+
+
+        def textOk():
+            print("write!")
+            self.doneLabel.configure(text = "✅")
+            allTextBoxStrings[row] = self.textBox.get()
+            print(allTextBoxStrings)
 
 
         Tk.Frame.__init__(self, master)
@@ -25,14 +47,14 @@ class QueryFrame(Tk.Frame):
         self.image.thumbnail((120, 120), PIL.Image.ANTIALIAS)
         self.queryImg = (PIL.ImageTk.PhotoImage(self.image))
         self.query = Tk.Label(self, image=self.queryImg)
-        # self.query.pack(side = 'left', padx = 10, pady = 10)
         self.query.grid(row = 1, column = 0, padx = 10, pady = 10)
+        self.candidate = candidate
 
         v = Tk.IntVar()
         v.set(0)
         self.candidateImg = []
-        for i, file in enumerate(candidate):
-            image = PIL.Image.open(file)
+        for i in range(5):
+            image = PIL.Image.open(self.candidate[i])
             image = image.resize([224, 126], resample=1)
             self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
             code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(i, i)
@@ -43,6 +65,20 @@ class QueryFrame(Tk.Frame):
             exec(code)
             code = "self.radio{}.grid(row=2, column = {}, sticky=Tk.N + Tk.S)".format(i, i+1)
             exec(code)
+
+        self.reloadButton = Tk.Button(self, text = '次の候補', command = loadMore)
+        self.reloadButton.grid(row = 1, column = 6, padx = 10, pady = 10)
+
+        self.textBox = Tk.Entry(self)
+        self.textBox.insert(Tk.END,"シーンの注釈を入力")
+        self.textBox.grid(row = 3, column = 1, columnspan = 5, sticky = Tk.W + Tk.E, padx = 10, pady = 10)
+
+        self.textOkButton = Tk.Button(self, text = "注釈を設定", command = textOk)
+        self.textOkButton.grid(row = 3, column = 6, padx = 10, pady = 10)
+
+        self.doneLabel = Tk.Label(self, text = "　 ")
+        self.doneLabel.grid(row = 3, column = 7, pady = 10)
+
 
 
 class MainFrame(Tk.Frame):
@@ -56,6 +92,7 @@ class MainFrame(Tk.Frame):
             print("summerizing... by",self.allRadioButtonResults)
             timeSeconds = []
             movieClips = []
+
             f = open("concat.txt", "w")
 
             for row in range(len(queryPath)):
@@ -67,19 +104,14 @@ class MainFrame(Tk.Frame):
                 output = ffmpeg.output(self.stream, "clopMovie_{}.mp4".format(row+1), t = 20, ss = int(timeSecond)-10)
                 ffmpeg.run(output)
 
-                cmd = "ffmpeg -y -ss {} -i {} -t {} clopMovie_{}.mp4".format(
-                    (int(timeSecond)/30)-5,
-                    "/Users/Sobue/Downloads/YummyFTP/RakutenDS/Hamburg_mitsuru_2018-01-08.mp4",
-                    10,
-                    row+1
-                    )
+                cmd = "ffmpeg -hide_banner -y -vf setpts=PTS/2.0 -af atempo=2.0 -ss {} -i {} -t {} clopMovie_{}.mp4".format(
+                    (int(timeSecond)/30)-5, "/Users/Sobue/Downloads/YummyFTP/RakutenDS/Hamburg_mitsuru_2018-01-08.mp4", 20, row+1)
                 f.write("file " + cropMoviename + "\n")
                 sp.call(cmd, shell = True)
 
             f.close()
-            cmd = "ffmpeg -y -f concat -i concat.txt -c copy summerizedMovie.mp4"
+            cmd = "ffmpeg -hide_banner -y -f concat -i concat.txt -c copy summerizedMovie.mp4"
             sp.call(cmd, shell = True)
-            print("done!")
             messagebox.showinfo("summery movie!", "Done!")
 
 
@@ -88,8 +120,12 @@ class MainFrame(Tk.Frame):
         self.stream = ffmpeg.input('/Users/Sobue/Downloads/YummyFTP/RakutenDS/Hamburg_mitsuru_2018-01-08.mp4')
 
         self.allRadioButtonResults = []
+        self.allTextBoxStrings = []
         for i in range(len(candidatePath)):
             self.allRadioButtonResults.append(0)
+
+        for i in range(len(candidatePath)):
+            self.allTextBoxStrings.append("")
 
         # # Allows update in later method
         # self.master = master
@@ -117,7 +153,7 @@ class MainFrame(Tk.Frame):
         # self.update_scroll_region()
 
         for row in range(len(queryPath)):
-            code = "self.queryFrame{} = QueryFrame(row, queryPath[row], candidatePath[row], self.allRadioButtonResults)".format(row)
+            code = "self.queryFrame{} = QueryFrame(row, queryPath[row], candidatePath[row], self.allRadioButtonResults, self.allTextBoxStrings)".format(row)
             exec(code)
             code = "self.queryFrame{}.pack(anchor = Tk.NW)".format(row)
             exec(code)
@@ -125,7 +161,7 @@ class MainFrame(Tk.Frame):
         self.grid_rowconfigure(0, weight=1, minsize=0)
         self.grid_columnconfigure(0, weight=1, minsize=0)
 
-        self.summeryButton = Tk.Button(self, text = "このキーフレームで動画要約開始", command = doSummery, padx = 10, pady = 10)
+        self.summeryButton = Tk.Button(self, text = "選択したキーフレームで動画要約開始", command = doSummery, padx = 10, pady = 10)
         self.summeryButton.pack(side="bottom")
 
 
