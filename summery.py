@@ -12,12 +12,12 @@ import subprocess as sp
 
 class QueryFrame(Tk.Frame):
     def __init__(self, row, query, candidate, allRadioButtonResults, allTextBoxStrings, master=None):
-        def change_state():
+        def change_state():#---------------------------------------------
             allRadioButtonResults[row] = v.get() #候補にしたTop番号がここに入る
             print(allRadioButtonResults)
+        #----------------------------------------------------------------
 
-
-        def loadMore():
+        def loadMore():#---------------------------------------------
             print("loadMore")
             unusedArray = self.candidate[0:5]
             del self.candidate[0:5]
@@ -31,14 +31,14 @@ class QueryFrame(Tk.Frame):
                 exec(code)
                 code = "self.candidate{}.grid(row = 1, column = {}, padx = 10, pady = 10)".format(i, i+1)
                 exec(code)
+        #---------------------------------------------
 
-
-        def textOk():
+        def textOk():#---------------------------------------------
             print("write!")
             self.doneLabel.configure(text = "✅")
             allTextBoxStrings[row] = self.textBox.get()
             print(allTextBoxStrings)
-
+        #---------------------------------------------
 
         Tk.Frame.__init__(self, master)
         self = Tk.LabelFrame(self, bd=2, relief="ridge", text="query {}".format(row+1))
@@ -82,13 +82,8 @@ class QueryFrame(Tk.Frame):
 
 
 class MainFrame(Tk.Frame):
-    def update_scroll_region(self):
-        ''' Call after every update to content in self.main_canvas '''
-        self.master.update()
-        self.canvas.config(scrollregion=self.canvas.bbox('all'))
-
     def __init__(self, queryPath, candidatePath, master=None):
-        def doSummery():
+        def doSummery():#------------------------------------------------------------------------------------
             print("summerizing... by",self.allRadioButtonResults)
             timeSeconds = []
             movieClips = []
@@ -113,7 +108,7 @@ class MainFrame(Tk.Frame):
             cmd = "ffmpeg -hide_banner -y -f concat -i concat.txt -c copy summerizedMovie.mp4"
             sp.call(cmd, shell = True)
             messagebox.showinfo("summery movie!", "Done!")
-
+        #--------------------------------------------------------------------------------------------------------
 
         Tk.Frame.__init__(self, master)
         self.master.title("summery movie!")
@@ -127,6 +122,17 @@ class MainFrame(Tk.Frame):
         for i in range(len(candidatePath)):
             self.allTextBoxStrings.append("")
 
+        for row in range(len(queryPath)):
+            code = "self.queryFrame{} = QueryFrame(row, queryPath[row], candidatePath[row], self.allRadioButtonResults, self.allTextBoxStrings)".format(row)
+            exec(code)
+            code = "self.queryFrame{}.pack(anchor = Tk.NW)".format(row)
+            exec(code)
+
+        self.summeryButton = Tk.Button(self, text = "選択したキーフレームで動画要約開始", command = doSummery, padx = 10, pady = 10)
+        self.summeryButton.pack(side="bottom")
+
+class App:
+    def __init__(self, master, queryPath, candidatePath):
         # Allows update in later method
         self.master = master
 
@@ -141,28 +147,22 @@ class MainFrame(Tk.Frame):
         self.y_axis_scrollbar.pack(side=Tk.RIGHT, fill=Tk.Y)
 
         # This is the frame all content will go to. The 'master' of the frame is the canvas
-        self.content_frame = self.master
+        self.content_frame = MainFrame(queryPath, candidatePath)
 
         # Place canvas on app pack/grid
         self.main_canvas.pack(side='left', fill='both', expand='True')
 
         # create_window draws the Frame on the canvas. Imagine it as another pack/grid
-        self.main_canvas.create_window(0, 0, window=self.master, anchor='nw')
+        self.main_canvas.create_window(0, 0, window=self.content_frame, anchor='nw')
 
         # Call this method after every update to the canvas
         self.update_scroll_region()
 
-        for row in range(len(queryPath)):
-            code = "self.queryFrame{} = QueryFrame(row, queryPath[row], candidatePath[row], self.allRadioButtonResults, self.allTextBoxStrings)".format(row)
-            exec(code)
-            code = "self.queryFrame{}.pack(anchor = Tk.NW)".format(row)
-            exec(code)
 
-        self.grid_rowconfigure(0, weight=1, minsize=0)
-        self.grid_columnconfigure(0, weight=1, minsize=0)
-
-        self.summeryButton = Tk.Button(self, text = "選択したキーフレームで動画要約開始", command = doSummery, padx = 10, pady = 10)
-        self.summeryButton.pack(side="bottom")
+    def update_scroll_region(self):
+        # ''' Call after every update to content in self.main_canvas '''
+        self.master.update()
+        self.main_canvas.config(scrollregion=self.main_canvas.bbox('all'))
 
 
 if __name__ == '__main__':
@@ -181,6 +181,7 @@ if __name__ == '__main__':
         os.remove("*.mp4")
     if os.path.exists("concat.txt"):
         os.remove("concat.txt")
-    mainFrame = MainFrame(queryPath, candidatePath)
-    mainFrame.pack()
-    mainFrame.mainloop()
+
+    root = Tk.Tk()
+    app = App(root, queryPath, candidatePath)
+    root.mainloop()
