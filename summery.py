@@ -82,10 +82,10 @@ class QueryFrame(Tk.Frame):
 
 
 class MainFrame(Tk.Frame):
-    # def update_scroll_region(self):
-    #     ''' Call after every update to content in self.main_canvas '''
-    #     self.master.update()
-    #     self.canvas.config(scrollregion=self.canvas.bbox('all'))
+    def update_scroll_region(self):
+        ''' Call after every update to content in self.main_canvas '''
+        self.master.update()
+        self.canvas.config(scrollregion=self.canvas.bbox('all'))
 
     def __init__(self, queryPath, candidatePath, master=None):
         def doSummery():
@@ -127,30 +127,30 @@ class MainFrame(Tk.Frame):
         for i in range(len(candidatePath)):
             self.allTextBoxStrings.append("")
 
-        # # Allows update in later method
-        # self.master = master
-        #
-        # # Create scroll bar
-        # self.y_axis_scrollbar = Tk.Scrollbar(self.master)
-        #
-        # # Create canvas with yscrollcommmand from scrollbar, use xscrollcommand for horizontal scroll
-        # self.main_canvas = Tk.Canvas(self.master, yscrollcommand=self.y_axis_scrollbar.set)
-        #
-        # # Configure and pack/grid scrollbar to master
-        # self.y_axis_scrollbar.config(command=self.main_canvas.yview)
-        # self.y_axis_scrollbar.pack(side=Tk.RIGHT, fill=Tk.Y)
-        #
-        # # This is the frame all content will go to. The 'master' of the frame is the canvas
-        # self.content_frame = self.master
-        #
-        # # Place canvas on app pack/grid
-        # self.main_canvas.pack(side='left', fill='both', expand='True')
-        #
-        # # create_window draws the Frame on the canvas. Imagine it as another pack/grid
-        # self.main_canvas.create_window(0, 0, window=self.master, anchor='nw')
-        #
-        # # Call this method after every update to the canvas
-        # self.update_scroll_region()
+        # Allows update in later method
+        self.master = master
+
+        # Create scroll bar
+        self.y_axis_scrollbar = Tk.Scrollbar(self.master)
+
+        # Create canvas with yscrollcommmand from scrollbar, use xscrollcommand for horizontal scroll
+        self.main_canvas = Tk.Canvas(self.master, yscrollcommand=self.y_axis_scrollbar.set)
+
+        # Configure and pack/grid scrollbar to master
+        self.y_axis_scrollbar.config(command=self.main_canvas.yview)
+        self.y_axis_scrollbar.pack(side=Tk.RIGHT, fill=Tk.Y)
+
+        # This is the frame all content will go to. The 'master' of the frame is the canvas
+        self.content_frame = self.master
+
+        # Place canvas on app pack/grid
+        self.main_canvas.pack(side='left', fill='both', expand='True')
+
+        # create_window draws the Frame on the canvas. Imagine it as another pack/grid
+        self.main_canvas.create_window(0, 0, window=self.master, anchor='nw')
+
+        # Call this method after every update to the canvas
+        self.update_scroll_region()
 
         for row in range(len(queryPath)):
             code = "self.queryFrame{} = QueryFrame(row, queryPath[row], candidatePath[row], self.allRadioButtonResults, self.allTextBoxStrings)".format(row)
