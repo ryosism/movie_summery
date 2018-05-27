@@ -44,9 +44,17 @@ class QueryFrame(Tk.Frame):
             def x():
                 print(str(i)+"が押されました")
                 print(candidate[i])
-                # image = PIL.Image.open(+150したファイル名)
-                # image.thumbnail((120, 120), PIL.Image.ANTIALIAS)
-                # self.candidateImg[i] = image
+                currentPath = candidate[i]
+                fileName = currentPath.split('/')[-1]
+                timeSecond, ext = os.path.splitext(fileName)
+                timeSecond -= 150
+                fileName = timeSecond + ext
+                dirPath = currentPath.split('/').pop()
+                newPath = dirPath + fileName
+                print(newPath)
+                image = PIL.Image.open(newPath)
+                image.thumbnail((120, 120), PIL.Image.ANTIALIAS)
+                self.candidateImg[i] = image
             return x
 
         def nextScene(i):
@@ -54,9 +62,16 @@ class QueryFrame(Tk.Frame):
                 print(str(i)+"が押されました")
                 print(candidate[i])
                 currentPath = candidate[i]
-                # image = PIL.Image.open(-150したファイル名)
-                # image.thumbnail((120, 120), PIL.Image.ANTIALIAS)
-                # self.candidateImg[i] = image
+                fileName = currentPath.split('/')[-1]
+                timeSecond, ext = os.path.splitext(fileName)
+                timeSecond += 150
+                fileName = timeSecond + ext
+                dirPath = currentPath.split('/').pop()
+                newPath = dirPath + fileName
+                print(newPath)
+                image = PIL.Image.open(newPath)
+                image.thumbnail((120, 120), PIL.Image.ANTIALIAS)
+                self.candidateImg[i] = image
             return x
 
 
