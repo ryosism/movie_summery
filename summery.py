@@ -43,12 +43,20 @@ class QueryFrame(Tk.Frame):
         def prevScene(i):
             def x():
                 print(str(i)+"が押されました")
+                print(candidate[i])
+                # image = PIL.Image.open(+150したファイル名)
+                # image.thumbnail((120, 120), PIL.Image.ANTIALIAS)
+                # self.candidateImg[i] = image
             return x
-
 
         def nextScene(i):
             def x():
                 print(str(i)+"が押されました")
+                print(candidate[i])
+                currentPath = candidate[i]
+                # image = PIL.Image.open(-150したファイル名)
+                # image.thumbnail((120, 120), PIL.Image.ANTIALIAS)
+                # self.candidateImg[i] = image
             return x
 
 
