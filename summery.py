@@ -40,6 +40,18 @@ class QueryFrame(Tk.Frame):
             print(allTextBoxStrings)
         #---------------------------------------------
 
+        def prevScene(i):
+            def x():
+                print(str(i)+"が押されました")
+            return x
+
+
+        def nextScene(i):
+            def x():
+                print(str(i)+"が押されました")
+            return x
+
+
         Tk.Frame.__init__(self, master)
         self = Tk.LabelFrame(self, bd=2, relief="ridge", text="query {}".format(row+1))
         self.pack(fill="x", padx=5, pady=5)
@@ -63,7 +75,11 @@ class QueryFrame(Tk.Frame):
             exec(code)
             code = "self.radio{} = Tk.Radiobutton(self, text = '候補にする', variable = v, value = {}, command = change_state)".format(i, i)
             exec(code)
-            code = "self.radio{}.grid(row=2, column = {}, sticky=Tk.N + Tk.S)".format(i, i+1)
+            code = "self.radio{}.grid(row=3, column = {}, sticky=Tk.N + Tk.S)".format(i, i+1)
+            exec(code)
+            code = 'self.prevButton{} = Tk.Button(self, text = "◀︎◀︎", command = prevScene(i)).grid(row = 2, column = {}, padx = 5, sticky = Tk.W)'.format(i, i+1)
+            exec(code)
+            code = 'self.nextButton{} = Tk.Button(self, text = "▶︎▶︎", command = nextScene(i)).grid(row = 2, column = {}, padx = 5, sticky = Tk.E)'.format(i, i+1)
             exec(code)
 
         self.reloadButton = Tk.Button(self, text = '次の候補', command = loadMore)
@@ -71,13 +87,13 @@ class QueryFrame(Tk.Frame):
 
         self.textBox = Tk.Entry(self)
         self.textBox.insert(Tk.END,"シーンの注釈を入力")
-        self.textBox.grid(row = 3, column = 1, columnspan = 5, sticky = Tk.W + Tk.E, padx = 10, pady = 10)
+        self.textBox.grid(row = 4, column = 1, columnspan = 5, sticky = Tk.W + Tk.E, padx = 10, pady = 10)
 
         self.textOkButton = Tk.Button(self, text = "注釈を設定", command = textOk)
-        self.textOkButton.grid(row = 3, column = 6, pady = 10)
+        self.textOkButton.grid(row = 4, column = 6, pady = 10)
 
         self.doneLabel = Tk.Label(self, text = "　 ")
-        self.doneLabel.grid(row = 3, column = 7, pady = 10)
+        self.doneLabel.grid(row = 4, column = 7, pady = 10)
 
 
 
