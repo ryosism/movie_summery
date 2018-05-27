@@ -37,6 +37,7 @@ class App:
         ''' Call after every update to content in self.main_canvas '''
         self.master.update()
         self.main_canvas.config(scrollregion=self.main_canvas.bbox('all'))
+        print(self.main_canvas.bbox('all'))
 
     def create_buttons(self):
         for index in range(20):
