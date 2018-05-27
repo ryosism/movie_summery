@@ -82,7 +82,7 @@ class QueryFrame(Tk.Frame):
 
 
 class MainFrame(Tk.Frame):
-    def __init__(self, queryPath, candidatePath, master=None):
+    def __init__(self, parent, queryPath, candidatePath, master=None):
         def doSummery():#------------------------------------------------------------------------------------
             print("summerizing... by",self.allRadioButtonResults)
             timeSeconds = []
@@ -110,8 +110,8 @@ class MainFrame(Tk.Frame):
             messagebox.showinfo("summery movie!", "Done!")
         #--------------------------------------------------------------------------------------------------------
 
-        Tk.Frame.__init__(self, master)
-        self.master.title("summery movie!")
+        super().__init__(parent)
+        # self.master.title("summery movie!")
         self.stream = ffmpeg.input('/Users/Sobue/Downloads/YummyFTP/RakutenDS/Hamburg_mitsuru_2018-01-08.mp4')
 
         self.allRadioButtonResults = []
@@ -128,10 +128,11 @@ class MainFrame(Tk.Frame):
             code = "self.queryFrame{}.pack(anchor = Tk.NW)".format(row)
             exec(code)
 
-        self.summeryButton = Tk.Button(self, text = "選択したキーフレームで動画要約開始", command = doSummery, padx = 10, pady = 10)
+        self.summeryButton = Tk.Button(parent, text = "選択したキーフレームで動画要約開始", command = doSummery, padx = 10, pady = 10)
         self.summeryButton.pack(side="bottom")
 
 class App:
+
     def __init__(self, master, queryPath, candidatePath):
         # Allows update in later method
         self.master = master
@@ -141,28 +142,37 @@ class App:
 
         # Create canvas with yscrollcommmand from scrollbar, use xscrollcommand for horizontal scroll
         self.main_canvas = Tk.Canvas(self.master, yscrollcommand=self.y_axis_scrollbar.set)
+        self.main_canvas.configure(scrollregion=(0,0,800,1000))
 
         # Configure and pack/grid scrollbar to master
-        self.y_axis_scrollbar.config(command=self.main_canvas.yview)
+        self.y_axis_scrollbar.configure(command=self.main_canvas.yview)
         self.y_axis_scrollbar.pack(side=Tk.RIGHT, fill=Tk.Y)
 
         # This is the frame all content will go to. The 'master' of the frame is the canvas
-        self.content_frame = MainFrame(queryPath, candidatePath)
+        self.content_frame = MainFrame(self.main_canvas, queryPath, candidatePath)
 
         # Place canvas on app pack/grid
-        self.main_canvas.pack(side='left', fill='both', expand='True')
+
 
         # create_window draws the Frame on the canvas. Imagine it as another pack/grid
-        self.main_canvas.create_window(0, 0, window=self.content_frame, anchor='nw')
+        self.main_canvas.create_window(0, 0, width = 800, height = 1000, window=self.content_frame)
+        self.main_canvas.pack(side='left', fill=Tk.BOTH, expand='True')
+
+        self.master.grid_rowconfigure(0, weight=0, minsize=0)
+        self.master.grid_rowconfigure(1, weight=1, minsize=0)
+
 
         # Call this method after every update to the canvas
         self.update_scroll_region()
 
 
     def update_scroll_region(self):
-        # ''' Call after every update to content in self.main_canvas '''
+        ''' Call after every update to content in self.main_canvas '''
         self.master.update()
-        self.main_canvas.config(scrollregion=self.main_canvas.bbox('all'))
+        self.main_canvas.configure(scrollregion=(0,0,800,1000))
+        self.master.grid_rowconfigure(0, weight=0, minsize=0)
+        self.master.grid_rowconfigure(1, weight=1, minsize=0)
+        print(self.main_canvas.bbox('all'))
 
 
 if __name__ == '__main__':
@@ -184,4 +194,5 @@ if __name__ == '__main__':
 
     root = Tk.Tk()
     app = App(root, queryPath, candidatePath)
+
     root.mainloop()
