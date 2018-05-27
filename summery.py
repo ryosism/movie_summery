@@ -11,7 +11,7 @@ import subprocess as sp
 
 
 class QueryFrame(Tk.Frame):
-    def __init__(self, row, query, candidate, allRadioButtonResults, allTextBoxStrings, master=None):
+    def __init__(self, parent, row, query, candidate, allRadioButtonResults, allTextBoxStrings, master=None):
         def change_state():#---------------------------------------------
             allRadioButtonResults[row] = v.get() #候補にしたTop番号がここに入る
             print(allRadioButtonResults)
@@ -25,7 +25,7 @@ class QueryFrame(Tk.Frame):
 
             for i in range(5):
                 image = PIL.Image.open(self.candidate[i])
-                image.thumbnail((120, 120), PIL.Image.ANTIALIAS)
+                image.thumbnail((140, 140), PIL.Image.ANTIALIAS)
                 self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
                 code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(i, i)
                 exec(code)
@@ -40,46 +40,87 @@ class QueryFrame(Tk.Frame):
             print(allTextBoxStrings)
         #---------------------------------------------
 
-        def prevScene(i):
+        def prevScene(candidateNum):
             def x():
-                print(str(i)+"が押されました")
-                print(candidate[i])
-                currentPath = candidate[i]
+                print(str(candidateNum)+"が押されました")
+                print(candidate[candidateNum])
+                currentPath = candidate[candidateNum]
                 fileName = currentPath.split('/')[-1]
                 timeSecond, ext = os.path.splitext(fileName)
-                timeSecond -= 150
-                fileName = timeSecond + ext
-                dirPath = currentPath.split('/').pop()
+                timeSecond = int(timeSecond)-300
+                fileName = str(timeSecond).zfill(5) + ext
+                dirPathArray = currentPath.split('/')
+                dirPathArray.pop()
+                dirPath = ""
+                for path in dirPathArray:
+                    dirPath += path + "/"
+
                 newPath = dirPath + fileName
                 print(newPath)
+                self.candidate[candidateNum] = newPath
+
+                # これを動かしたい
+                # parent.candidatePath[row] = self.candidate
+
                 image = PIL.Image.open(newPath)
-                image.thumbnail((120, 120), PIL.Image.ANTIALIAS)
-                self.candidateImg[i] = image
+                image.thumbnail((140, 140), PIL.Image.ANTIALIAS)
+                self.candidateImg[candidateNum] = image
+
+                self.candidateImg = []
+                for i in range(5):
+                    image = PIL.Image.open(self.candidate[i])
+                    image.thumbnail((140, 140), PIL.Image.ANTIALIAS)
+                    self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
+                    code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(i, i)
+                    exec(code)
+                    code = "self.candidate{}.grid(row = 1, column = {}, padx = 10, pady = 10)".format(i, i+1)
+                    exec(code)
             return x
 
-        def nextScene(i):
+        def nextScene(candidateNum):
             def x():
-                print(str(i)+"が押されました")
-                print(candidate[i])
-                currentPath = candidate[i]
+                print(str(candidateNum)+"が押されました")
+                print(candidate[candidateNum])
+                currentPath = candidate[candidateNum]
                 fileName = currentPath.split('/')[-1]
                 timeSecond, ext = os.path.splitext(fileName)
-                timeSecond += 150
-                fileName = timeSecond + ext
-                dirPath = currentPath.split('/').pop()
+                timeSecond = int(timeSecond)+300
+                fileName = str(timeSecond).zfill(5) + ext
+                dirPathArray = currentPath.split('/')
+                dirPathArray.pop()
+                dirPath = ""
+                for path in dirPathArray:
+                    dirPath += path + "/"
+
                 newPath = dirPath + fileName
                 print(newPath)
+                self.candidate[candidateNum] = newPath
+
+                # これを動かしたい
+                # parent.candidatePath[row] = self.candidate
+
                 image = PIL.Image.open(newPath)
-                image.thumbnail((120, 120), PIL.Image.ANTIALIAS)
-                self.candidateImg[i] = image
+                image.thumbnail((140, 140), PIL.Image.ANTIALIAS)
+                self.candidateImg[candidateNum] = image
+
+                self.candidateImg = []
+                for i in range(5):
+                    image = PIL.Image.open(self.candidate[i])
+                    image.thumbnail((140, 140), PIL.Image.ANTIALIAS)
+                    self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
+                    code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(i, i)
+                    exec(code)
+                    code = "self.candidate{}.grid(row = 1, column = {}, padx = 10, pady = 5)".format(i, i+1)
+                    exec(code)
             return x
 
 
         Tk.Frame.__init__(self, master)
+        print(row)
         self = Tk.LabelFrame(self, bd=2, relief="ridge", text="query {}".format(row+1))
         self.pack(fill="x", padx=5, pady=5)
         self.image = PIL.Image.open(query)
-        self.image.thumbnail((120, 120), PIL.Image.ANTIALIAS)
+        self.image.thumbnail((140, 140), PIL.Image.ANTIALIAS)
         self.queryImg = (PIL.ImageTk.PhotoImage(self.image))
         self.query = Tk.Label(self, image=self.queryImg)
         self.query.grid(row = 1, rowspan = 3, column = 0, padx = 10, pady = 10)
@@ -90,15 +131,15 @@ class QueryFrame(Tk.Frame):
         self.candidateImg = []
         for i in range(5):
             image = PIL.Image.open(self.candidate[i])
-            image.thumbnail((120, 120), PIL.Image.ANTIALIAS)
+            image.thumbnail((140, 140), PIL.Image.ANTIALIAS)
             self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
             code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(i, i)
             exec(code)
-            code = "self.candidate{}.grid(row = 1, column = {}, padx = 10, pady = 10)".format(i, i+1)
+            code = "self.candidate{}.grid(row = 1, column = {}, padx = 10)".format(i, i+1)
             exec(code)
             code = "self.radio{} = Tk.Radiobutton(self, text = '候補にする', variable = v, value = {}, command = change_state)".format(i, i)
             exec(code)
-            code = "self.radio{}.grid(row=3, column = {}, sticky=Tk.N + Tk.S)".format(i, i+1)
+            code = "self.radio{}.grid(row=3, column = {}, pady = 5, sticky=Tk.N + Tk.S)".format(i, i+1)
             exec(code)
             code = 'self.prevButton{} = Tk.Button(self, text = "◀︎◀︎", command = prevScene(i)).grid(row = 2, column = {}, padx = 5, sticky = Tk.W)'.format(i, i+1)
             exec(code)
@@ -110,13 +151,13 @@ class QueryFrame(Tk.Frame):
 
         self.textBox = Tk.Entry(self)
         self.textBox.insert(Tk.END,"シーンの注釈を入力")
-        self.textBox.grid(row = 4, column = 1, columnspan = 5, sticky = Tk.W + Tk.E, padx = 10, pady = 10)
+        self.textBox.grid(row = 1, column = 7, columnspan = 8, sticky = Tk.W + Tk.E, padx = 10, pady = 10)
 
         self.textOkButton = Tk.Button(self, text = "注釈を設定", command = textOk)
-        self.textOkButton.grid(row = 4, column = 6, pady = 10)
+        self.textOkButton.grid(row = 2, column = 7)
 
         self.doneLabel = Tk.Label(self, text = "　 ")
-        self.doneLabel.grid(row = 4, column = 7, pady = 10)
+        self.doneLabel.grid(row = 2, column = 8, pady = 10)
 
 
 
@@ -162,7 +203,7 @@ class MainFrame(Tk.Frame):
             self.allTextBoxStrings.append("")
 
         for row in range(len(queryPath)):
-            code = "self.queryFrame{} = QueryFrame(row, queryPath[row], candidatePath[row], self.allRadioButtonResults, self.allTextBoxStrings)".format(row)
+            code = "self.queryFrame{} = QueryFrame(self, row, queryPath[row], candidatePath[row], self.allRadioButtonResults, self.allTextBoxStrings)".format(row)
             exec(code)
             code = "self.queryFrame{}.pack(anchor = Tk.NW)".format(row)
             exec(code)
