@@ -25,7 +25,7 @@ class QueryFrame(Tk.Frame):
 
             for i in range(5):
                 image = PIL.Image.open(self.candidate[i])
-                image = image.resize([224, 126], resample=1)
+                image.thumbnail((120, 120), PIL.Image.ANTIALIAS)
                 self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
                 code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(i, i)
                 exec(code)
@@ -47,7 +47,7 @@ class QueryFrame(Tk.Frame):
         self.image.thumbnail((120, 120), PIL.Image.ANTIALIAS)
         self.queryImg = (PIL.ImageTk.PhotoImage(self.image))
         self.query = Tk.Label(self, image=self.queryImg)
-        self.query.grid(row = 1, column = 0, padx = 10, pady = 10)
+        self.query.grid(row = 1, rowspan = 3, column = 0, padx = 10, pady = 10)
         self.candidate = candidate
 
         v = Tk.IntVar()
@@ -55,7 +55,7 @@ class QueryFrame(Tk.Frame):
         self.candidateImg = []
         for i in range(5):
             image = PIL.Image.open(self.candidate[i])
-            image = image.resize([224, 126], resample=1)
+            image.thumbnail((120, 120), PIL.Image.ANTIALIAS)
             self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
             code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(i, i)
             exec(code)
@@ -74,7 +74,7 @@ class QueryFrame(Tk.Frame):
         self.textBox.grid(row = 3, column = 1, columnspan = 5, sticky = Tk.W + Tk.E, padx = 10, pady = 10)
 
         self.textOkButton = Tk.Button(self, text = "注釈を設定", command = textOk)
-        self.textOkButton.grid(row = 3, column = 6, padx = 10, pady = 10)
+        self.textOkButton.grid(row = 3, column = 6, pady = 10)
 
         self.doneLabel = Tk.Label(self, text = "　 ")
         self.doneLabel.grid(row = 3, column = 7, pady = 10)
