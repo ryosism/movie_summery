@@ -11,7 +11,7 @@ import subprocess as sp
 
 
 class QueryFrame(Tk.Frame):
-    def __init__(self, parent, row, query, candidate, allRadioButtonResults, allTextBoxStrings, master=None):
+    def __init__(self, row, query, candidate, allRadioButtonResults, allTextBoxStrings, master=None):
         def change_state():#---------------------------------------------
             allRadioButtonResults[row] = v.get() #候補にしたTop番号がここに入る
             print(allRadioButtonResults)
@@ -60,7 +60,7 @@ class QueryFrame(Tk.Frame):
                 self.candidate[candidateNum] = newPath
 
                 # これを動かしたい
-                # parent.candidatePath[row] = self.candidate
+                candidatePath[row] = self.candidate
 
                 image = PIL.Image.open(newPath)
                 image.thumbnail((140, 140), PIL.Image.ANTIALIAS)
@@ -97,7 +97,7 @@ class QueryFrame(Tk.Frame):
                 self.candidate[candidateNum] = newPath
 
                 # これを動かしたい
-                # parent.candidatePath[row] = self.candidate
+                candidatePath[row] = self.candidate
 
                 image = PIL.Image.open(newPath)
                 image.thumbnail((140, 140), PIL.Image.ANTIALIAS)
@@ -203,7 +203,7 @@ class MainFrame(Tk.Frame):
             self.allTextBoxStrings.append("")
 
         for row in range(len(queryPath)):
-            code = "self.queryFrame{} = QueryFrame(self, row, queryPath[row], candidatePath[row], self.allRadioButtonResults, self.allTextBoxStrings)".format(row)
+            code = "self.queryFrame{} = QueryFrame(row, queryPath[row], candidatePath[row], self.allRadioButtonResults, self.allTextBoxStrings)".format(row)
             exec(code)
             code = "self.queryFrame{}.pack(anchor = Tk.NW)".format(row)
             exec(code)
