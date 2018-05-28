@@ -29,7 +29,7 @@ class QueryFrame(Tk.Frame):
                 self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
                 code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(i, i)
                 exec(code)
-                code = "self.candidate{}.grid(row = 1, column = {}, padx = 10, pady = 10)".format(i, i+1)
+                code = "self.candidate{}.grid(row = 1, column = {}, padx = 10)".format(i, i+1)
                 exec(code)
         #---------------------------------------------
 
@@ -73,7 +73,7 @@ class QueryFrame(Tk.Frame):
                     self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
                     code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(i, i)
                     exec(code)
-                    code = "self.candidate{}.grid(row = 1, column = {}, padx = 10, pady = 10)".format(i, i+1)
+                    code = "self.candidate{}.grid(row = 1, column = {}, padx = 10)".format(i, i+1)
                     exec(code)
             return x
 
@@ -110,7 +110,7 @@ class QueryFrame(Tk.Frame):
                     self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
                     code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(i, i)
                     exec(code)
-                    code = "self.candidate{}.grid(row = 1, column = {}, padx = 10, pady = 5)".format(i, i+1)
+                    code = "self.candidate{}.grid(row = 1, column = {}, padx = 10)".format(i, i+1)
                     exec(code)
             return x
 
