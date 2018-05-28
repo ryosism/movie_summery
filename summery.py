@@ -18,7 +18,6 @@ class QueryFrame(Tk.Frame):
         #----------------------------------------------------------------
 
         def loadMore():#---------------------------------------------
-            print("loadMore")
             unusedArray = self.candidate[0:5]
             del self.candidate[0:5]
             self.candidate += unusedArray
@@ -34,7 +33,6 @@ class QueryFrame(Tk.Frame):
         #---------------------------------------------
 
         def textOk():#---------------------------------------------
-            print("write!")
             self.doneLabel.configure(text = "✅")
             allTextBoxStrings[row] = self.textBox.get()
             print(allTextBoxStrings)
@@ -42,8 +40,6 @@ class QueryFrame(Tk.Frame):
 
         def prevScene(candidateNum):
             def x():
-                print(str(candidateNum)+"が押されました")
-                print(candidate[candidateNum])
                 currentPath = candidate[candidateNum]
                 fileName = currentPath.split('/')[-1]
                 timeSecond, ext = os.path.splitext(fileName)
@@ -56,7 +52,6 @@ class QueryFrame(Tk.Frame):
                     dirPath += path + "/"
 
                 newPath = dirPath + fileName
-                print(newPath)
                 self.candidate[candidateNum] = newPath
 
                 # これを動かしたい
@@ -79,8 +74,6 @@ class QueryFrame(Tk.Frame):
 
         def nextScene(candidateNum):
             def x():
-                print(str(candidateNum)+"が押されました")
-                print(candidate[candidateNum])
                 currentPath = candidate[candidateNum]
                 fileName = currentPath.split('/')[-1]
                 timeSecond, ext = os.path.splitext(fileName)
@@ -93,7 +86,6 @@ class QueryFrame(Tk.Frame):
                     dirPath += path + "/"
 
                 newPath = dirPath + fileName
-                print(newPath)
                 self.candidate[candidateNum] = newPath
 
                 # これを動かしたい
@@ -116,7 +108,6 @@ class QueryFrame(Tk.Frame):
 
 
         Tk.Frame.__init__(self, master)
-        print(row)
         self = Tk.LabelFrame(self, bd=2, relief="ridge", text="query {}".format(row+1))
         self.pack(fill="x", padx=5, pady=5)
         self.image = PIL.Image.open(query)
@@ -181,7 +172,6 @@ class MainFrame(Tk.Frame):
 
                 cmd = "ffmpeg -hide_banner -y -r 90 -ss {} -i {} -t {} clopMovie_{}.mp4".format(
                     (int(timeSecond)/30)-5, "/Users/Sobue/Downloads/YummyFTP/RakutenDS/Hamburg_mitsuru_2018-01-08.mp4", 10, row+1)
-                print(cmd)
                 f.write("file " + cropMoviename + "\n")
                 sp.call(cmd, shell = True)
 
