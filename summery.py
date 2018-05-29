@@ -171,7 +171,7 @@ class MainFrame(Tk.Frame):
                 clopMoviename = "clopMovie_{}.mp4".format(row+1)
 
                 cmd = "ffmpeg -hide_banner -y -r 90 -ss {} -i {} -t {} {}".format(
-                    (int(timeSecond)/30)-5, "/Users/Sobue/Downloads/YummyFTP/RakutenDS/Hamburg_mitsuru_2018-01-08.mp4", 10, row+1, clopMoviename)
+                    (int(timeSecond)/30)-5, "/Users/Sobue/Downloads/YummyFTP/RakutenDS/Hamburg_mitsuru_2018-01-08.mp4", 50/len(queryPath), clopMoviename)
                 sp.call(cmd, shell = True)
 
                 # video = mp.VideoFileClip("clopMovie_{}.mp4".format(row+1))
