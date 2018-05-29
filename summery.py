@@ -8,6 +8,8 @@ import json
 import sys, os
 import ffmpeg
 import subprocess as sp
+from glob import glob
+# from moviepy import editor as mp
 
 
 class QueryFrame(Tk.Frame):
@@ -172,8 +174,13 @@ class MainFrame(Tk.Frame):
 
                 cmd = "ffmpeg -hide_banner -y -r 90 -ss {} -i {} -t {} clopMovie_{}.mp4".format(
                     (int(timeSecond)/30)-5, "/Users/Sobue/Downloads/YummyFTP/RakutenDS/Hamburg_mitsuru_2018-01-08.mp4", 10, row+1)
-                f.write("file " + cropMoviename + "\n")
                 sp.call(cmd, shell = True)
+
+                # video = mp.VideoFileClip("clopMovie_{}.mp4".format(row+1))
+                # txt_clip = mp.TextClip(self.allTextBoxStrings[row],fontsize=40,color='white').set_position('center','South').set_duration(10)
+                # result = mp.CompositeVideoClip([video, txt_clip])
+                # result.write_videofile("clopMovie_{}_edited.mp4",format(row+1),fps=30)
+                # f.write("file " + "clopMovie_1_edited.mp4".format(row+1) + "\n")
 
             f.close()
 
@@ -202,6 +209,27 @@ class MainFrame(Tk.Frame):
 
         self.summeryButton = Tk.Button(parent, text = "選択したキーフレームで動画要約開始", command = doSummery, padx = 10, pady = 10)
         self.summeryButton.pack(side="bottom")
+
+        self.lastFlame = Tk.Frame(self)
+        self.lastFlamelabel = Tk.LabelFrame(self.lastFlame, bd=2, relief="ridge", text="openning & closing")
+        self.lastFlamelabel.pack(side = "right", padx=5, pady=5)
+        self.lastFramePic =
+
+        # 一番最後のフレームをとる！
+        frames = glob("PATH to Frames/*")
+        frames.sort()
+        self.lastText = Tk.Label(self.lastFlame, text = "一番美味しそうな動画フレームを選んでください")
+        self.lastText.grid(row = 0, column = 0, padx = 5, pady = 5)
+
+        self.lastImage = PIL.Image.open(frames[-1])
+        self.lastImage.thumbnail((140, 140), PIL.Image.ANTIALIAS)
+        self.lastQueryImg = (PIL.ImageTk.PhotoImage(self.image))
+        self.lastQuery = Tk.Label(self.lastFlame, image=self.queryImg)
+        self.lastQuery.grid(row = 1, column = 0, padx = 5, pady = 5)
+
+        self.last = 
+
+        self.lastFlame.pack(side = Tk.NE)
 
 class App:
 
