@@ -168,19 +168,18 @@ class MainFrame(Tk.Frame):
                 fileName = filePath.split('/')[-1]
                 timeSecond, ext = os.path.splitext(fileName)
                 timeSeconds.append(timeSecond)
-                cropMoviename = "clopMovie_{}.mp4".format(row+1)
-                output = ffmpeg.output(self.stream, "clopMovie_{}.mp4".format(row+1), t = 20, ss = int(timeSecond)-10)
-                ffmpeg.run(output)
+                clopMoviename = "clopMovie_{}.mp4".format(row+1)
 
-                cmd = "ffmpeg -hide_banner -y -r 90 -ss {} -i {} -t {} clopMovie_{}.mp4".format(
-                    (int(timeSecond)/30)-5, "/Users/Sobue/Downloads/YummyFTP/RakutenDS/Hamburg_mitsuru_2018-01-08.mp4", 10, row+1)
+                cmd = "ffmpeg -hide_banner -y -r 90 -ss {} -i {} -t {} {}".format(
+                    (int(timeSecond)/30)-5, "/Users/Sobue/Downloads/YummyFTP/RakutenDS/Hamburg_mitsuru_2018-01-08.mp4", 10, row+1, clopMoviename)
                 sp.call(cmd, shell = True)
 
                 # video = mp.VideoFileClip("clopMovie_{}.mp4".format(row+1))
                 # txt_clip = mp.TextClip(self.allTextBoxStrings[row],fontsize=40,color='white').set_position('center','South').set_duration(10)
                 # result = mp.CompositeVideoClip([video, txt_clip])
                 # result.write_videofile("clopMovie_{}_edited.mp4",format(row+1),fps=30)
-                # f.write("file " + "clopMovie_1_edited.mp4".format(row+1) + "\n")
+
+                f.write("file " + clopMoviename + "\n")
 
             f.close()
 
