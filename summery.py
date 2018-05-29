@@ -286,8 +286,9 @@ if __name__ == '__main__':
         candidatePath = candidatePath[epoch]
         # -----------------------------
         # -----------------------------
-    if os.path.exists("clopMovie*"):
-        os.remove("clopMovie*")
+    paths = glob("*.mp4")
+    for path in paths:
+        os.remove(path)
     if os.path.exists("concat.txt"):
         os.remove("concat.txt")
 
