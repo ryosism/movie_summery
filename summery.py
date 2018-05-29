@@ -13,7 +13,7 @@ from glob import glob
 
 
 class QueryFrame(Tk.Frame):
-    def __init__(self, row, query, candidate, allRadioButtonResults, allTextBoxStrings, master=None):
+    def __init__(self, parent, row, query, candidate, allRadioButtonResults, allTextBoxStrings, master=None):
         def change_state():#---------------------------------------------
             allRadioButtonResults[row] = v.get() #候補にしたTop番号がここに入る
             print(allRadioButtonResults)
@@ -109,7 +109,7 @@ class QueryFrame(Tk.Frame):
             return x
 
 
-        Tk.Frame.__init__(self, master)
+        super().__init__(parent, master)
         self = Tk.LabelFrame(self, bd=2, relief="ridge", text="query {}".format(row+1))
         self.pack(fill="x", padx=5, pady=5)
         self.image = PIL.Image.open(query)
@@ -202,7 +202,7 @@ class MainFrame(Tk.Frame):
             self.allTextBoxStrings.append("")
 
         for row in range(len(queryPath)):
-            code = "self.queryFrame{} = QueryFrame(row, queryPath[row], candidatePath[row], self.allRadioButtonResults, self.allTextBoxStrings)".format(row)
+            code = "self.queryFrame{} = QueryFrame(self, row, queryPath[row], candidatePath[row], self.allRadioButtonResults, self.allTextBoxStrings)".format(row)
             exec(code)
             code = "self.queryFrame{}.pack(anchor = Tk.NW)".format(row)
             exec(code)
@@ -211,25 +211,22 @@ class MainFrame(Tk.Frame):
         self.summeryButton.pack(side="bottom")
 
         self.lastFlame = Tk.Frame(self)
-        self.lastFlamelabel = Tk.LabelFrame(self.lastFlame, bd=2, relief="ridge", text="openning & closing")
-        self.lastFlamelabel.pack(side = "right", padx=5, pady=5)
-        self.lastFramePic =
+        # self.lastFlamelabel = Tk.LabelFrame(self.lastFlame, bd=2, relief="ridge", text="openning & closing")
+        # self.lastFlamelabel.pack(padx=5, pady=5)
 
         # 一番最後のフレームをとる！
-        frames = glob("PATH to Frames/*")
+        frames = glob("/Users/Sobue/Downloads/YummyFTP/RakutenDS/triplet/input/Hamburg_mitsuru30_resize//*")
         frames.sort()
         self.lastText = Tk.Label(self.lastFlame, text = "一番美味しそうな動画フレームを選んでください")
-        self.lastText.grid(row = 0, column = 0, padx = 5, pady = 5)
+        self.lastText.grid(row = 0, column = 8, padx = 5, pady = 5)
 
         self.lastImage = PIL.Image.open(frames[-1])
         self.lastImage.thumbnail((140, 140), PIL.Image.ANTIALIAS)
-        self.lastQueryImg = (PIL.ImageTk.PhotoImage(self.image))
-        self.lastQuery = Tk.Label(self.lastFlame, image=self.queryImg)
-        self.lastQuery.grid(row = 1, column = 0, padx = 5, pady = 5)
+        self.lastImg = PIL.ImageTk.PhotoImage(self.lastImage)
+        self.lastFrameImg = Tk.Label(self.lastFlame, image=self.lastImg)
+        self.lastFrameImg.grid(row = 1, column = 9, padx = 5, pady = 5)
 
-        self.last = 
-
-        self.lastFlame.pack(side = Tk.NE)
+        self.lastFlame.pack(anchor = Tk.NE, side = 'bottom')
 
 class App:
 
@@ -242,7 +239,7 @@ class App:
 
         # Create canvas with yscrollcommmand from scrollbar, use xscrollcommand for horizontal scroll
         self.main_canvas = Tk.Canvas(self.master, yscrollcommand=self.y_axis_scrollbar.set)
-        self.main_canvas.configure(scrollregion=(0,0,800,1000))
+        self.main_canvas.configure(scrollregion=self.main_canvas.bbox('all'))
 
         # Configure and pack/grid scrollbar to master
         self.y_axis_scrollbar.configure(command=self.main_canvas.yview)
@@ -255,7 +252,7 @@ class App:
 
 
         # create_window draws the Frame on the canvas. Imagine it as another pack/grid
-        self.main_canvas.create_window(0, 0, width = 800, height = 1000, window=self.content_frame)
+        self.main_canvas.create_window(0, 0, window=self.content_frame)
         self.main_canvas.pack(side='left', fill=Tk.BOTH, expand='True')
 
         self.master.grid_rowconfigure(0, weight=0, minsize=0)
@@ -269,7 +266,7 @@ class App:
     def update_scroll_region(self):
         ''' Call after every update to content in self.main_canvas '''
         self.master.update()
-        self.main_canvas.configure(scrollregion=(0,0,800,1000))
+        self.main_canvas.configure(scrollregion=self.main_canvas.bbox('all'))
         self.master.grid_rowconfigure(0, weight=0, minsize=0)
         self.master.grid_rowconfigure(1, weight=1, minsize=0)
         print(self.main_canvas.bbox('all'))
