@@ -162,6 +162,7 @@ class MainFrame(Tk.Frame):
             movieClips = []
 
             f = open("concat.txt", "w")
+            zimaku = open("zimaku.srt", "w")
 
             for row in range(len(queryPath)):
                 filePath = candidatePath[row][self.allRadioButtonResults[row]]
@@ -181,10 +182,19 @@ class MainFrame(Tk.Frame):
 
                 f.write("file " + clopMoviename + "\n")
 
+                zimaku.write("{}\n".format(row+1))
+                zimaku.write("00:00:{},000 --> 00:00:{},000\n".format(str(row * 10).zfill(2), str((row+1) * 10).zfill(2)))
+                zimaku.write(self.allTextBoxStrings[row] +"\n\n")
+
+            zimaku.close()
+
             f.close()
 
             cmd = "ffmpeg -hide_banner -y -f concat -i concat.txt -c copy summerizedMovie.mp4"
             sp.call(cmd, shell = True)
+            cmd = "ffmpeg -i summerizedMovie.mp4 -vf subtitles=zimaku.srt:force_style=FontSize=40 summerizedMovie_srt.mp4"
+            sp.call(cmd, shell = True)
+
             messagebox.showinfo("summery movie!", "Done!")
             sys.exit()
         #--------------------------------------------------------------------------------------------------------
@@ -295,6 +305,8 @@ if __name__ == '__main__':
         os.remove(path)
     if os.path.exists("concat.txt"):
         os.remove("concat.txt")
+    if os.path.exists("*.srt"):
+        os.remove("*.srt")
 
     root = Tk.Tk()
     app = App(root, queryPath, candidatePath)
