@@ -26,7 +26,7 @@ class QueryFrame(Tk.Frame):
 
             for i in range(5):
                 image = PIL.Image.open(self.candidate[i])
-                image.thumbnail((200, 200), PIL.Image.ANTIALIAS)
+                image.thumbnail((150, 150), PIL.Image.ANTIALIAS)
                 self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
                 code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(i, i)
                 exec(code)
@@ -60,13 +60,13 @@ class QueryFrame(Tk.Frame):
                 candidatePath[row] = self.candidate
 
                 image = PIL.Image.open(newPath)
-                image.thumbnail((200, 200), PIL.Image.ANTIALIAS)
+                image.thumbnail((150, 150), PIL.Image.ANTIALIAS)
                 self.candidateImg[candidateNum] = image
 
                 self.candidateImg = []
                 for i in range(5):
                     image = PIL.Image.open(self.candidate[i])
-                    image.thumbnail((200, 200), PIL.Image.ANTIALIAS)
+                    image.thumbnail((150, 150), PIL.Image.ANTIALIAS)
                     self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
                     code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(i, i)
                     exec(code)
@@ -94,13 +94,13 @@ class QueryFrame(Tk.Frame):
                 candidatePath[row] = self.candidate
 
                 image = PIL.Image.open(newPath)
-                image.thumbnail((200, 200), PIL.Image.ANTIALIAS)
+                image.thumbnail((150, 150), PIL.Image.ANTIALIAS)
                 self.candidateImg[candidateNum] = image
 
                 self.candidateImg = []
                 for i in range(5):
                     image = PIL.Image.open(self.candidate[i])
-                    image.thumbnail((200, 200), PIL.Image.ANTIALIAS)
+                    image.thumbnail((150, 150), PIL.Image.ANTIALIAS)
                     self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
                     code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(i, i)
                     exec(code)
@@ -113,7 +113,7 @@ class QueryFrame(Tk.Frame):
         self = Tk.LabelFrame(self, bd=2, relief="ridge", text="query {}".format(row+1))
         self.pack(fill="x", padx=5, pady=5)
         self.image = PIL.Image.open(query)
-        self.image.thumbnail((200, 200), PIL.Image.ANTIALIAS)
+        self.image.thumbnail((150, 150), PIL.Image.ANTIALIAS)
         self.queryImg = (PIL.ImageTk.PhotoImage(self.image))
         self.query = Tk.Label(self, image=self.queryImg)
         self.query.grid(row = 1, rowspan = 3, column = 0, padx = 10, pady = 10)
@@ -124,7 +124,7 @@ class QueryFrame(Tk.Frame):
         self.candidateImg = []
         for i in range(5):
             image = PIL.Image.open(self.candidate[i])
-            image.thumbnail((200, 200), PIL.Image.ANTIALIAS)
+            image.thumbnail((150, 150), PIL.Image.ANTIALIAS)
             self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
             code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(i, i)
             exec(code)
@@ -171,7 +171,7 @@ class MainFrame(Tk.Frame):
                 clopMoviename = "clopMovie_{}.mp4".format(row+1)
 
                 cmd = "ffmpeg -hide_banner -y -r 90 -ss {} -i {} -t {} {}".format(
-                    (int(timeSecond)/30)-5, "/Users/Sobue/Downloads/YummyFTP/RakutenDS/Hamburg_mitsuru_2018-01-08.mp4", 50/len(queryPath), clopMoviename)
+                    (int(timeSecond)/30)-5, "/Users/ryou/Downloads/Yummy_FTP_Watcher/triplet/input/Hamburg_mitsuru_2018-01-08.mp4", 50/len(queryPath), clopMoviename)
                 sp.call(cmd, shell = True)
 
                 # video = mp.VideoFileClip("clopMovie_{}.mp4".format(row+1))
@@ -190,7 +190,7 @@ class MainFrame(Tk.Frame):
 
         super().__init__(parent)
         # self.master.title("summery movie!")
-        self.stream = ffmpeg.input('/Users/Sobue/Downloads/YummyFTP/RakutenDS/Hamburg_mitsuru_2018-01-08.mp4')
+        self.stream = ffmpeg.input('/Users/ryou/Downloads/Yummy_FTP_Watcher/triplet/input/Hamburg_mitsuru_2018-01-08.mp4')
 
         self.allRadioButtonResults = []
         self.allTextBoxStrings = []
@@ -214,13 +214,13 @@ class MainFrame(Tk.Frame):
         # self.lastFlamelabel = Tk.LabelFrame(self, bd=2, relief="ridge", text="openning & closing")
         # self.lastFlamelabel.pack(padx=5, pady=5)
         #
-        # frames = glob("/Users/Sobue/Downloads/YummyFTP/RakutenDS/triplet/input/Hamburg_mitsuru30_resize//*")
+        # frames = glob("/Users/ryou/Downloads/Yummy_FTP_Watcher/triplet/Hamburg_mitsuru30_resize/*")
         # frames.sort()
         # self.lastText = Tk.Label(self.lastFlame, text = "一番美味しそうな動画フレームを選んでください")
-        # self.lastText.grid(row = 0, column = 8, padx = 5, pady = 5)
+        # self.lastText.grid(row = 0, column = 0, padx = 5, pady = 5)
         #
         # self.lastImage = PIL.Image.open(frames[-1])
-        # self.lastImage.thumbnail((200, 200), PIL.Image.ANTIALIAS)
+        # self.lastImage.thumbnail((150, 150), PIL.Image.ANTIALIAS)
         # self.lastImg = PIL.ImageTk.PhotoImage(self.lastImage)
         # self.lastFrameImg = Tk.Label(self.lastFlame, image=self.lastImg)
         # self.lastFrameImg.grid(row = 1, column = 9, padx = 5, pady = 5)
@@ -237,14 +237,18 @@ class App:
 
         # Create scroll bar
         self.y_axis_scrollbar = Tk.Scrollbar(self.master)
+        self.x_axis_scrollbar = Tk.Scrollbar(self.master)
 
         # Create canvas with yscrollcommmand from scrollbar, use xscrollcommand for horizontal scroll
-        self.main_canvas = Tk.Canvas(self.master, yscrollcommand=self.y_axis_scrollbar.set)
+        self.main_canvas = Tk.Canvas(self.master, yscrollcommand=self.y_axis_scrollbar.set, xscrollcommand=self.x_axis_scrollbar.set)
         self.main_canvas.configure(scrollregion=self.main_canvas.bbox('all'))
 
         # Configure and pack/grid scrollbar to master
         self.y_axis_scrollbar.configure(command=self.main_canvas.yview)
         self.y_axis_scrollbar.pack(side=Tk.RIGHT, fill=Tk.Y)
+
+        self.x_axis_scrollbar.configure(command=self.main_canvas.xview)
+        self.x_axis_scrollbar.pack(side=Tk.BOTTOM, fill=Tk.X)
 
         # This is the frame all content will go to. The 'master' of the frame is the canvas
         self.content_frame = MainFrame(self.main_canvas, queryPath, candidatePath)
@@ -257,7 +261,7 @@ class App:
         self.main_canvas.pack(side='left', fill=Tk.BOTH, expand='True')
 
         self.master.grid_rowconfigure(0, weight=0, minsize=0)
-        self.master.grid_rowconfigure(1, weight=1, minsize=0)
+        # self.master.grid_rowconfigure(1, weight=1, minsize=0)
 
 
         # Call this method after every update to the canvas
