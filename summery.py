@@ -26,7 +26,7 @@ class QueryFrame(Tk.Frame):
 
             for i in range(5):
                 image = PIL.Image.open(self.candidate[i])
-                image.thumbnail((150, 150), PIL.Image.ANTIALIAS)
+                image.thumbnail((180, 180), PIL.Image.ANTIALIAS)
                 self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
                 code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(i, i)
                 exec(code)
@@ -45,7 +45,7 @@ class QueryFrame(Tk.Frame):
                 currentPath = candidate[candidateNum]
                 fileName = currentPath.split('/')[-1]
                 timeSecond, ext = os.path.splitext(fileName)
-                timeSecond = int(timeSecond)-300
+                timeSecond = int(timeSecond)-900
                 fileName = str(timeSecond).zfill(5) + ext
                 dirPathArray = currentPath.split('/')
                 dirPathArray.pop()
@@ -60,17 +60,17 @@ class QueryFrame(Tk.Frame):
                 candidatePath[row] = self.candidate
 
                 image = PIL.Image.open(newPath)
-                image.thumbnail((150, 150), PIL.Image.ANTIALIAS)
+                image.thumbnail((180, 180), PIL.Image.ANTIALIAS)
                 self.candidateImg[candidateNum] = image
 
                 self.candidateImg = []
                 for i in range(5):
                     image = PIL.Image.open(self.candidate[i])
-                    image.thumbnail((150, 150), PIL.Image.ANTIALIAS)
+                    image.thumbnail((180, 180), PIL.Image.ANTIALIAS)
                     self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
                     code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(i, i)
                     exec(code)
-                    code = "self.candidate{}.grid(row = 1, column = {}, padx = 10)".format(i, i+1)
+                    code = "self.candidate{}.grid(row = 1, column = {}, padx = 5)".format(i, i+1)
                     exec(code)
             return x
 
@@ -79,7 +79,7 @@ class QueryFrame(Tk.Frame):
                 currentPath = candidate[candidateNum]
                 fileName = currentPath.split('/')[-1]
                 timeSecond, ext = os.path.splitext(fileName)
-                timeSecond = int(timeSecond)+300
+                timeSecond = int(timeSecond)+900
                 fileName = str(timeSecond).zfill(5) + ext
                 dirPathArray = currentPath.split('/')
                 dirPathArray.pop()
@@ -94,13 +94,13 @@ class QueryFrame(Tk.Frame):
                 candidatePath[row] = self.candidate
 
                 image = PIL.Image.open(newPath)
-                image.thumbnail((150, 150), PIL.Image.ANTIALIAS)
+                image.thumbnail((180, 180), PIL.Image.ANTIALIAS)
                 self.candidateImg[candidateNum] = image
 
                 self.candidateImg = []
                 for i in range(5):
                     image = PIL.Image.open(self.candidate[i])
-                    image.thumbnail((150, 150), PIL.Image.ANTIALIAS)
+                    image.thumbnail((180, 180), PIL.Image.ANTIALIAS)
                     self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
                     code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(i, i)
                     exec(code)
@@ -113,7 +113,7 @@ class QueryFrame(Tk.Frame):
         self = Tk.LabelFrame(self, bd=2, relief="ridge", text="query {}".format(row+1))
         self.pack(fill="x", padx=5, pady=5)
         self.image = PIL.Image.open(query)
-        self.image.thumbnail((150, 150), PIL.Image.ANTIALIAS)
+        self.image.thumbnail((180, 180), PIL.Image.ANTIALIAS)
         self.queryImg = (PIL.ImageTk.PhotoImage(self.image))
         self.query = Tk.Label(self, image=self.queryImg)
         self.query.grid(row = 1, rowspan = 3, column = 0, padx = 10, pady = 10)
@@ -124,33 +124,33 @@ class QueryFrame(Tk.Frame):
         self.candidateImg = []
         for i in range(5):
             image = PIL.Image.open(self.candidate[i])
-            image.thumbnail((150, 150), PIL.Image.ANTIALIAS)
+            image.thumbnail((180, 180), PIL.Image.ANTIALIAS)
             self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
             code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(i, i)
             exec(code)
-            code = "self.candidate{}.grid(row = 1, column = {}, padx = 10)".format(i, i+1)
+            code = "self.candidate{}.grid(row = 1, column = {}, padx = 5)".format(i, i+1)
             exec(code)
             code = "self.radio{} = Tk.Radiobutton(self, text = 'キーフレームにする', variable = v, value = {}, command = change_state)".format(i, i)
             exec(code)
             code = "self.radio{}.grid(row=3, column = {}, pady = 5, sticky=Tk.N + Tk.S)".format(i, i+1)
             exec(code)
-            code = 'self.prevButton{} = Tk.Button(self, text = "◀︎◀︎", command = prevScene(i)).grid(row = 2, column = {}, padx = 15, sticky = Tk.W)'.format(i, i+1)
+            code = 'self.prevButton{} = Tk.Button(self, text = "◀︎-20秒", command = prevScene(i)).grid(row = 2, column = {}, padx = 5, sticky = Tk.W)'.format(i, i+1)
             exec(code)
-            code = 'self.nextButton{} = Tk.Button(self, text = "▶︎▶︎", command = nextScene(i)).grid(row = 2, column = {}, padx = 15, sticky = Tk.E)'.format(i, i+1)
+            code = 'self.nextButton{} = Tk.Button(self, text = "+20秒▶︎", command = nextScene(i)).grid(row = 2, column = {}, padx = 5, sticky = Tk.E)'.format(i, i+1)
             exec(code)
 
-        self.reloadButton = Tk.Button(self, text = '次の候補', command = loadMore)
-        self.reloadButton.grid(row = 1, column = 6, padx = 10, pady = 10)
+        # self.reloadButton = Tk.Button(self, text = '次の候補', command = loadMore)
+        # self.reloadButton.grid(row = 1, column = 6, padx = 10, pady = 10)
 
         self.textBox = Tk.Entry(self)
         self.textBox.insert(Tk.END,"シーンの注釈を入力")
-        self.textBox.grid(row = 1, column = 7, columnspan = 8, sticky = Tk.W + Tk.E, padx = 10, pady = 10)
+        self.textBox.grid(row = 1, column = 6, columnspan = 8, sticky = Tk.W + Tk.E, padx = 10, pady = 10)
 
         self.textOkButton = Tk.Button(self, text = "注釈を設定", command = textOk)
-        self.textOkButton.grid(row = 2, column = 7)
+        self.textOkButton.grid(row = 2, column = 6)
 
         self.doneLabel = Tk.Label(self, text = "　 ")
-        self.doneLabel.grid(row = 2, column = 8, pady = 10)
+        self.doneLabel.grid(row = 2, column = 7, pady = 10)
 
 
 
@@ -186,6 +186,7 @@ class MainFrame(Tk.Frame):
             cmd = "ffmpeg -hide_banner -y -f concat -i concat.txt -c copy summerizedMovie.mp4"
             sp.call(cmd, shell = True)
             messagebox.showinfo("summery movie!", "Done!")
+            sys.exit()
         #--------------------------------------------------------------------------------------------------------
 
         super().__init__(parent)
@@ -220,7 +221,7 @@ class MainFrame(Tk.Frame):
         # self.lastText.grid(row = 0, column = 0, padx = 5, pady = 5)
         #
         # self.lastImage = PIL.Image.open(frames[-1])
-        # self.lastImage.thumbnail((150, 150), PIL.Image.ANTIALIAS)
+        # self.lastImage.thumbnail((180, 180), PIL.Image.ANTIALIAS)
         # self.lastImg = PIL.ImageTk.PhotoImage(self.lastImage)
         # self.lastFrameImg = Tk.Label(self.lastFlame, image=self.lastImg)
         # self.lastFrameImg.grid(row = 1, column = 9, padx = 5, pady = 5)
