@@ -30,7 +30,7 @@ class QueryFrame(Tk.Frame):
                 self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
                 code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(i, i)
                 exec(code)
-                code = "self.candidate{}.grid(row = 1, column = {}, padx = 10)".format(i, i+1)
+                code = "self.candidate{}.grid(row = 1, column = {}, padx = 5)".format(i, i+1)
                 exec(code)
         #---------------------------------------------
 
@@ -104,7 +104,7 @@ class QueryFrame(Tk.Frame):
                     self.candidateImg.append(PIL.ImageTk.PhotoImage(image))
                     code = "self.candidate{} = Tk.Label(self, image=self.candidateImg[{}])".format(i, i)
                     exec(code)
-                    code = "self.candidate{}.grid(row = 1, column = {}, padx = 10)".format(i, i+1)
+                    code = "self.candidate{}.grid(row = 1, column = {}, padx = 5)".format(i, i+1)
                     exec(code)
             return x
 
@@ -142,7 +142,7 @@ class QueryFrame(Tk.Frame):
         # self.reloadButton = Tk.Button(self, text = '次の候補', command = loadMore)
         # self.reloadButton.grid(row = 1, column = 6, padx = 10, pady = 10)
 
-        self.textBox = Tk.Entry(self)
+        self.textBox = Tk.Entry(self, font=("",12))
         self.textBox.insert(Tk.END,"シーンの注釈を入力")
         self.textBox.grid(row = 1, column = 6, columnspan = 8, sticky = Tk.W + Tk.E, padx = 10, pady = 10)
 
@@ -161,8 +161,13 @@ class MainFrame(Tk.Frame):
             timeSeconds = []
             movieClips = []
 
-            f = open("concat.txt", "w")
+            concat = open("concat.txt", "w")
             zimaku = open("zimaku.srt", "w")
+
+            concat.write("file clopMovie_{}.mp4\n".format(str(len(queryPath))))
+            zimaku.write("1\n")
+            zimaku.write("00:00:00,000 --> 00:00:10,000\n")
+            zimaku.write("{}\n\n".format(self.lastEntry.get()))
 
             for row in range(len(queryPath)):
                 filePath = candidatePath[row][self.allRadioButtonResults[row]]
@@ -180,15 +185,14 @@ class MainFrame(Tk.Frame):
                 # result = mp.CompositeVideoClip([video, txt_clip])
                 # result.write_videofile("clopMovie_{}_edited.mp4",format(row+1),fps=30)
 
-                f.write("file " + clopMoviename + "\n")
+                concat.write("file " + clopMoviename + "\n")
 
-                zimaku.write("{}\n".format(row+1))
-                zimaku.write("00:00:{},000 --> 00:00:{},000\n".format(str(row * 10).zfill(2), str((row+1) * 10).zfill(2)))
+                zimaku.write("{}\n".format(row+2))
+                zimaku.write("00:00:{},000 --> 00:00:{},000\n".format(str((row+1) * 10).zfill(2), str((row+2) * 10).zfill(2)))
                 zimaku.write(self.allTextBoxStrings[row] +"\n\n")
 
             zimaku.close()
-
-            f.close()
+            concat.close()
 
             cmd = "ffmpeg -hide_banner -y -f concat -i concat.txt -c copy summerizedMovie.mp4"
             sp.call(cmd, shell = True)
@@ -196,7 +200,7 @@ class MainFrame(Tk.Frame):
             sp.call(cmd, shell = True)
 
             messagebox.showinfo("summery movie!", "Done!")
-            sys.exit()
+            # sys.exit()
         #--------------------------------------------------------------------------------------------------------
 
         super().__init__(parent)
@@ -221,7 +225,13 @@ class MainFrame(Tk.Frame):
         self.summeryButton.pack(side="bottom")
 
         # # 一番最後のフレームをとる！
-        # self.lastFlame = Tk.Frame(self)
+        self.lastFlame = Tk.Frame(self)
+        self.lastText = Tk.Label(self.lastFlame, text = "タイトルのテキストを入力してください")
+        self.lastText.grid(row = 0, column = 0, padx = 5, pady = 5)
+
+        self.lastEntry = Tk.Entry(self.lastFlame, font=("",12))
+        self.lastEntry.insert(Tk.END,"タイトルのテキストを入力")
+        self.lastEntry.grid(row = 1, column = 0, columnspan = 1, sticky = Tk.S + Tk.E + Tk.W, padx = 10, pady = 10)
         # self.lastFlamelabel = Tk.LabelFrame(self, bd=2, relief="ridge", text="openning & closing")
         # self.lastFlamelabel.pack(padx=5, pady=5)
         #
@@ -236,7 +246,7 @@ class MainFrame(Tk.Frame):
         # self.lastFrameImg = Tk.Label(self.lastFlame, image=self.lastImg)
         # self.lastFrameImg.grid(row = 1, column = 9, padx = 5, pady = 5)
         #
-        # self.lastFlame.pack(anchor = Tk.NE, side = 'bottom')
+        self.lastFlame.pack(anchor = Tk.S, side = 'bottom')
 
 class App:
 
