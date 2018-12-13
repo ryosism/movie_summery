@@ -130,23 +130,23 @@ class QueryFrame(Tk.Frame):
             exec(code)
             code = "self.candidate{}.grid(row = 1, column = {}, padx = 5)".format(i, i+1)
             exec(code)
-            code = "self.radio{} = Tk.Radiobutton(self, text = 'キーフレームにする', variable = v, value = {}, command = change_state)".format(i, i)
+            code = "self.radio{} = Tk.Radiobutton(self, text = 'Set as keyframe', variable = v, value = {}, command = change_state)".format(i, i)
             exec(code)
             code = "self.radio{}.grid(row=3, column = {}, pady = 5, sticky=Tk.N + Tk.S)".format(i, i+1)
             exec(code)
-            code = 'self.prevButton{} = Tk.Button(self, text = "◀︎-20秒", command = prevScene(i)).grid(row = 2, column = {}, padx = 5, sticky = Tk.W)'.format(i, i+1)
+            code = "self.prevButton{} = Tk.Button(self, text = '◀︎-20(sec)', command = prevScene(i)).grid(row = 2, column = {}, padx = 2, sticky = Tk.W)".format(i, i+1)
             exec(code)
-            code = 'self.nextButton{} = Tk.Button(self, text = "+20秒▶︎", command = nextScene(i)).grid(row = 2, column = {}, padx = 5, sticky = Tk.E)'.format(i, i+1)
+            code = 'self.nextButton{} = Tk.Button(self, text = "+20(sec)▶︎", command = nextScene(i)).grid(row = 2, column = {}, padx = 2, sticky = Tk.E)'.format(i, i+1)
             exec(code)
 
         # self.reloadButton = Tk.Button(self, text = '次の候補', command = loadMore)
         # self.reloadButton.grid(row = 1, column = 6, padx = 10, pady = 10)
 
         self.textBox = Tk.Entry(self, font=("",12))
-        self.textBox.insert(Tk.END,"シーンの注釈を入力")
-        self.textBox.grid(row = 1, column = 6, columnspan = 8, sticky = Tk.W + Tk.E, padx = 10, pady = 10)
+        self.textBox.insert(Tk.END,"Input scene description")
+        self.textBox.grid(row = 1, column = 6, columnspan = 9, sticky = Tk.W + Tk.E, padx = 10, pady = 10)
 
-        self.textOkButton = Tk.Button(self, text = "注釈を設定", command = textOk)
+        self.textOkButton = Tk.Button(self, text = "Apply description", command = textOk)
         self.textOkButton.grid(row = 2, column = 6)
 
         self.doneLabel = Tk.Label(self, text = "　 ")
@@ -221,16 +221,16 @@ class MainFrame(Tk.Frame):
             code = "self.queryFrame{}.pack(anchor = Tk.NW)".format(row)
             exec(code)
 
-        self.summeryButton = Tk.Button(self, text = "選択したキーフレームで動画要約開始", command = doSummery, padx = 10, pady = 10)
+        self.summeryButton = Tk.Button(self, text = "Summarize movie by selected keyframe!", command = doSummery, padx = 10, pady = 10)
         self.summeryButton.pack(side="bottom")
 
         # # 一番最後のフレームをとる！
         self.lastFlame = Tk.Frame(self)
-        self.lastText = Tk.Label(self.lastFlame, text = "タイトルのテキストを入力してください")
+        self.lastText = Tk.Label(self.lastFlame, text = "Please input title text.")
         self.lastText.grid(row = 0, column = 0, padx = 5, pady = 5)
 
         self.lastEntry = Tk.Entry(self.lastFlame, font=("",12))
-        self.lastEntry.insert(Tk.END,"タイトルのテキストを入力")
+        self.lastEntry.insert(Tk.END,"input title")
         self.lastEntry.grid(row = 1, column = 0, columnspan = 1, sticky = Tk.S + Tk.E + Tk.W, padx = 10, pady = 10)
         # self.lastFlamelabel = Tk.LabelFrame(self, bd=2, relief="ridge", text="openning & closing")
         # self.lastFlamelabel.pack(padx=5, pady=5)
@@ -264,6 +264,9 @@ class App:
         self.main_canvas = Tk.Canvas(self.master, yscrollcommand=self.y_axis_scrollbar.set, xscrollcommand=self.x_axis_scrollbar.set)
         self.main_canvas.configure(scrollregion=self.main_canvas.bbox('all'))
 
+
+
+
         # Configure and pack/grid scrollbar to master
         self.y_axis_scrollbar.configure(command=self.main_canvas.yview)
         self.y_axis_scrollbar.pack(side=Tk.RIGHT, fill=Tk.Y)
@@ -277,6 +280,10 @@ class App:
         # Place canvas on app pack/grid
 
 
+        #マウスカーソルが乗ったときX軸Y軸スクロールバーをバインド
+
+
+
         # create_window draws the Frame on the canvas. Imagine it as another pack/grid
         self.main_canvas.create_window(0, 0, window=self.content_frame)
         self.main_canvas.pack(side='left', fill=Tk.BOTH, expand='True')
@@ -284,6 +291,11 @@ class App:
         self.master.grid_rowconfigure(0, weight=0, minsize=0)
         # self.master.grid_rowconfigure(1, weight=1, minsize=0)
 
+        self.y_axis_scrollbar.bind('<MouseWheel>', lambda e:self.main_canvas.yview_scroll(-1*(1 if e.delta>0 else -1),UNITS))
+        self.y_axis_scrollbar.bind('<Enter>',lambda e:self.y_axis_scrollbar.focus_set())
+        self.main_canvas.bind('<Enter>',lambda e:self.y_axis_scrollbar.focus_set())
+        self.x_axis_scrollbar.bind('<MouseWheel>', lambda e:self.main_canvas.xview_scroll(-1*(1 if e.delta>0 else -1),UNITS))
+        self.x_axis_scrollbar.bind('<Enter>',lambda e:self.x_axis_scrollbar.focus_set())
 
         # Call this method after every update to the canvas
         self.update_scroll_region()
