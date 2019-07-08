@@ -310,6 +310,15 @@ class App:
         print(self.main_canvas.bbox('all'))
 
 
+def fixButtonLabel():
+    a = root.winfo_geometry().split('+')[0]
+    b = a.split('x')
+    w = int(b[0])
+    h = int(b[1])
+    root.geometry('%dx%d' % (w+1,h+1))
+
+
+
 if __name__ == '__main__':
     with open("query_112.json", "r") as file:
         queryPath = json.load(file)
@@ -332,5 +341,7 @@ if __name__ == '__main__':
 
     root = Tk.Tk()
     app = App(root, queryPath, candidatePath)
+    root.update()
+    root.after(0, fixButtonLabel)
 
     root.mainloop()
