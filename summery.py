@@ -4,11 +4,17 @@ import tkinter as Tk
 from tkinter import messagebox
 import PIL.Image
 import PIL.ImageTk
+import random
 import json
 import sys, os
 import ffmpeg
 import subprocess as sp
 from glob import glob
+from pathlib import Path
+import matplotlib
+matplotlib.use('tkagg')
+#
+# print("Configureing moviepy...")
 # from moviepy import editor as mp
 
 
@@ -45,8 +51,8 @@ class QueryFrame(Tk.Frame):
                 currentPath = candidate[candidateNum]
                 fileName = currentPath.split('/')[-1]
                 timeSecond, ext = os.path.splitext(fileName)
-                timeSecond = int(timeSecond)-900
-                fileName = str(timeSecond).zfill(5) + ext
+                timeSecond = int(timeSecond)-600
+                fileName = str(timeSecond).zfill(7) + ext
                 dirPathArray = currentPath.split('/')
                 dirPathArray.pop()
                 dirPath = ""
@@ -79,8 +85,8 @@ class QueryFrame(Tk.Frame):
                 currentPath = candidate[candidateNum]
                 fileName = currentPath.split('/')[-1]
                 timeSecond, ext = os.path.splitext(fileName)
-                timeSecond = int(timeSecond)+900
-                fileName = str(timeSecond).zfill(5) + ext
+                timeSecond = int(timeSecond)+600
+                fileName = str(timeSecond).zfill(7) + ext
                 dirPathArray = currentPath.split('/')
                 dirPathArray.pop()
                 dirPath = ""
@@ -155,7 +161,7 @@ class QueryFrame(Tk.Frame):
 
 
 class MainFrame(Tk.Frame):
-    def __init__(self, parent, queryPath, candidatePath, master=None):
+    def __init__(self, parent, queryPath, candidatePath, fullVideoPath, master=None):
         def doSummery():#------------------------------------------------------------------------------------
             print("summerizing... by",self.allRadioButtonResults)
             timeSeconds = []
@@ -164,9 +170,11 @@ class MainFrame(Tk.Frame):
             concat = open("concat.txt", "w")
             zimaku = open("zimaku.srt", "w")
 
+            secondsForScene = int(50/len(queryPath))
+
             concat.write("file clopMovie_{}.mp4\n".format(str(len(queryPath))))
             zimaku.write("1\n")
-            zimaku.write("00:00:00,000 --> 00:00:10,000\n")
+            zimaku.write("00:00:00,000 --> 00:00:{},000\n".format(str(secondsForScene).zfill(2)))
             zimaku.write("{}\n\n".format(self.lastEntry.get()))
 
             for row in range(len(queryPath)):
@@ -176,8 +184,7 @@ class MainFrame(Tk.Frame):
                 timeSeconds.append(timeSecond)
                 clopMoviename = "clopMovie_{}.mp4".format(row+1)
 
-                cmd = "ffmpeg -hide_banner -y -r 90 -ss {} -i {} -t {} {}".format(
-                    (int(timeSecond)/30)-5, "/Users/ryou/Downloads/Yummy_FTP_Watcher/triplet/input/Hamburg_mitsuru_2018-01-08.mp4", 50/len(queryPath), clopMoviename)
+                cmd = "ffmpeg -hide_banner -y -r 90 -ss {} -i {} -t {} {}".format((int(timeSecond)/30)-(secondsForScene/2), str(fullVideoPath), secondsForScene, clopMoviename)
                 sp.call(cmd, shell = True)
 
                 # video = mp.VideoFileClip("clopMovie_{}.mp4".format(row+1))
@@ -188,7 +195,7 @@ class MainFrame(Tk.Frame):
                 concat.write("file " + clopMoviename + "\n")
 
                 zimaku.write("{}\n".format(row+2))
-                zimaku.write("00:00:{},000 --> 00:00:{},000\n".format(str((row+1) * 10).zfill(2), str((row+2) * 10).zfill(2)))
+                zimaku.write("00:00:{},000 --> 00:00:{},000\n".format(str((row+1) * secondsForScene).zfill(2), str((row+2) * secondsForScene).zfill(2)))
                 zimaku.write(self.allTextBoxStrings[row] +"\n\n")
 
             zimaku.close()
@@ -205,7 +212,7 @@ class MainFrame(Tk.Frame):
 
         super().__init__(parent)
         # self.master.title("summery movie!")
-        self.stream = ffmpeg.input('/Users/ryou/Downloads/Yummy_FTP_Watcher/triplet/input/Hamburg_mitsuru_2018-01-08.mp4')
+        self.stream = ffmpeg.input(str(fullVideoPath))
 
         self.allRadioButtonResults = []
         self.allTextBoxStrings = []
@@ -250,7 +257,7 @@ class MainFrame(Tk.Frame):
 
 class App:
 
-    def __init__(self, master, queryPath, candidatePath):
+    def __init__(self, master, queryPath, candidatePath, fullVideoPath):
         # Allows update in later method
         self.master = master
         self.master.title("movie summery")
@@ -275,7 +282,7 @@ class App:
         self.x_axis_scrollbar.pack(side=Tk.BOTTOM, fill=Tk.X)
 
         # This is the frame all content will go to. The 'master' of the frame is the canvas
-        self.content_frame = MainFrame(self.main_canvas, queryPath, candidatePath)
+        self.content_frame = MainFrame(self.main_canvas, queryPath, candidatePath, fullVideoPath)
 
         # Place canvas on app pack/grid
 
@@ -320,17 +327,16 @@ def fixButtonLabel():
 
 
 if __name__ == '__main__':
-    with open("query_112.json", "r") as file:
+    fullVideoPath = Path(sys.argv[1])
+
+    with open("015_whole_query.json", "r") as file:
         queryPath = json.load(file)
 
-    with open("candidate_112.json", "r") as file:
+    with open("015_merge_candidate_detection_wo100words_noun.json", "r") as file:
         candidatePath = json.load(file)
-        # -----------------------------
-        # -----------------------------
-        epoch = int(sys.argv[1])
-        candidatePath = candidatePath[epoch]
-        # -----------------------------
-        # -----------------------------
+
+    epoch = random.randint(0, len(candidatePath))
+    candidatePath = candidatePath[epoch]
     paths = glob("*.mp4")
     for path in paths:
         os.remove(path)
@@ -340,7 +346,7 @@ if __name__ == '__main__':
         os.remove("*.srt")
 
     root = Tk.Tk()
-    app = App(root, queryPath, candidatePath)
+    app = App(root, queryPath, candidatePath, fullVideoPath)
     root.update()
     root.after(0, fixButtonLabel)
 
