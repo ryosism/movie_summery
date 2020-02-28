@@ -4,11 +4,17 @@ import tkinter as Tk
 from tkinter import messagebox
 import PIL.Image
 import PIL.ImageTk
+import random
 import json
 import sys, os
 import ffmpeg
 import subprocess as sp
 from glob import glob
+from pathlib import Path
+import matplotlib
+matplotlib.use('tkagg')
+#
+# print("Configureing moviepy...")
 # from moviepy import editor as mp
 
 
@@ -45,8 +51,8 @@ class QueryFrame(Tk.Frame):
                 currentPath = candidate[candidateNum]
                 fileName = currentPath.split('/')[-1]
                 timeSecond, ext = os.path.splitext(fileName)
-                timeSecond = int(timeSecond)-900
-                fileName = str(timeSecond).zfill(5) + ext
+                timeSecond = int(timeSecond)-600
+                fileName = str(timeSecond).zfill(7) + ext
                 dirPathArray = currentPath.split('/')
                 dirPathArray.pop()
                 dirPath = ""
@@ -79,8 +85,8 @@ class QueryFrame(Tk.Frame):
                 currentPath = candidate[candidateNum]
                 fileName = currentPath.split('/')[-1]
                 timeSecond, ext = os.path.splitext(fileName)
-                timeSecond = int(timeSecond)+900
-                fileName = str(timeSecond).zfill(5) + ext
+                timeSecond = int(timeSecond)+600
+                fileName = str(timeSecond).zfill(7) + ext
                 dirPathArray = currentPath.split('/')
                 dirPathArray.pop()
                 dirPath = ""
@@ -130,23 +136,23 @@ class QueryFrame(Tk.Frame):
             exec(code)
             code = "self.candidate{}.grid(row = 1, column = {}, padx = 5)".format(i, i+1)
             exec(code)
-            code = "self.radio{} = Tk.Radiobutton(self, text = 'キーフレームにする', variable = v, value = {}, command = change_state)".format(i, i)
+            code = "self.radio{} = Tk.Radiobutton(self, text = 'Set as keyframe', variable = v, value = {}, command = change_state)".format(i, i)
             exec(code)
             code = "self.radio{}.grid(row=3, column = {}, pady = 5, sticky=Tk.N + Tk.S)".format(i, i+1)
             exec(code)
-            code = 'self.prevButton{} = Tk.Button(self, text = "◀︎-20秒", command = prevScene(i)).grid(row = 2, column = {}, padx = 5, sticky = Tk.W)'.format(i, i+1)
+            code = "self.prevButton{} = Tk.Button(self, text = '◀︎-20(sec)', command = prevScene(i)).grid(row = 2, column = {}, padx = 2, sticky = Tk.W)".format(i, i+1)
             exec(code)
-            code = 'self.nextButton{} = Tk.Button(self, text = "+20秒▶︎", command = nextScene(i)).grid(row = 2, column = {}, padx = 5, sticky = Tk.E)'.format(i, i+1)
+            code = 'self.nextButton{} = Tk.Button(self, text = "+20(sec)▶︎", command = nextScene(i)).grid(row = 2, column = {}, padx = 2, sticky = Tk.E)'.format(i, i+1)
             exec(code)
 
         # self.reloadButton = Tk.Button(self, text = '次の候補', command = loadMore)
         # self.reloadButton.grid(row = 1, column = 6, padx = 10, pady = 10)
 
         self.textBox = Tk.Entry(self, font=("",12))
-        self.textBox.insert(Tk.END,"シーンの注釈を入力")
-        self.textBox.grid(row = 1, column = 6, columnspan = 8, sticky = Tk.W + Tk.E, padx = 10, pady = 10)
+        self.textBox.insert(Tk.END,"Input scene description")
+        self.textBox.grid(row = 1, column = 6, columnspan = 9, sticky = Tk.W + Tk.E, padx = 10, pady = 10)
 
-        self.textOkButton = Tk.Button(self, text = "注釈を設定", command = textOk)
+        self.textOkButton = Tk.Button(self, text = "Apply description", command = textOk)
         self.textOkButton.grid(row = 2, column = 6)
 
         self.doneLabel = Tk.Label(self, text = "　 ")
@@ -155,7 +161,7 @@ class QueryFrame(Tk.Frame):
 
 
 class MainFrame(Tk.Frame):
-    def __init__(self, parent, queryPath, candidatePath, master=None):
+    def __init__(self, parent, queryPath, candidatePath, fullVideoPath, master=None):
         def doSummery():#------------------------------------------------------------------------------------
             print("summerizing... by",self.allRadioButtonResults)
             timeSeconds = []
@@ -164,9 +170,11 @@ class MainFrame(Tk.Frame):
             concat = open("concat.txt", "w")
             zimaku = open("zimaku.srt", "w")
 
+            secondsForScene = int(50/len(queryPath))
+
             concat.write("file clopMovie_{}.mp4\n".format(str(len(queryPath))))
             zimaku.write("1\n")
-            zimaku.write("00:00:00,000 --> 00:00:10,000\n")
+            zimaku.write("00:00:00,000 --> 00:00:{},000\n".format(str(secondsForScene).zfill(2)))
             zimaku.write("{}\n\n".format(self.lastEntry.get()))
 
             for row in range(len(queryPath)):
@@ -176,8 +184,7 @@ class MainFrame(Tk.Frame):
                 timeSeconds.append(timeSecond)
                 clopMoviename = "clopMovie_{}.mp4".format(row+1)
 
-                cmd = "ffmpeg -hide_banner -y -r 90 -ss {} -i {} -t {} {}".format(
-                    (int(timeSecond)/30)-5, "/Users/ryou/Downloads/Yummy_FTP_Watcher/triplet/input/Hamburg_mitsuru_2018-01-08.mp4", 50/len(queryPath), clopMoviename)
+                cmd = "ffmpeg -hide_banner -y -r 90 -ss {} -i {} -t {} {}".format((int(timeSecond)/30)-(secondsForScene/2), str(fullVideoPath), secondsForScene, clopMoviename)
                 sp.call(cmd, shell = True)
 
                 # video = mp.VideoFileClip("clopMovie_{}.mp4".format(row+1))
@@ -188,7 +195,7 @@ class MainFrame(Tk.Frame):
                 concat.write("file " + clopMoviename + "\n")
 
                 zimaku.write("{}\n".format(row+2))
-                zimaku.write("00:00:{},000 --> 00:00:{},000\n".format(str((row+1) * 10).zfill(2), str((row+2) * 10).zfill(2)))
+                zimaku.write("00:00:{},000 --> 00:00:{},000\n".format(str((row+1) * secondsForScene).zfill(2), str((row+2) * secondsForScene).zfill(2)))
                 zimaku.write(self.allTextBoxStrings[row] +"\n\n")
 
             zimaku.close()
@@ -205,7 +212,7 @@ class MainFrame(Tk.Frame):
 
         super().__init__(parent)
         # self.master.title("summery movie!")
-        self.stream = ffmpeg.input('/Users/ryou/Downloads/Yummy_FTP_Watcher/triplet/input/Hamburg_mitsuru_2018-01-08.mp4')
+        self.stream = ffmpeg.input(str(fullVideoPath))
 
         self.allRadioButtonResults = []
         self.allTextBoxStrings = []
@@ -221,16 +228,16 @@ class MainFrame(Tk.Frame):
             code = "self.queryFrame{}.pack(anchor = Tk.NW)".format(row)
             exec(code)
 
-        self.summeryButton = Tk.Button(self, text = "選択したキーフレームで動画要約開始", command = doSummery, padx = 10, pady = 10)
+        self.summeryButton = Tk.Button(self, text = "Summarize movie by selected keyframe!", command = doSummery, padx = 10, pady = 10)
         self.summeryButton.pack(side="bottom")
 
         # # 一番最後のフレームをとる！
         self.lastFlame = Tk.Frame(self)
-        self.lastText = Tk.Label(self.lastFlame, text = "タイトルのテキストを入力してください")
+        self.lastText = Tk.Label(self.lastFlame, text = "Please input title text.")
         self.lastText.grid(row = 0, column = 0, padx = 5, pady = 5)
 
         self.lastEntry = Tk.Entry(self.lastFlame, font=("",12))
-        self.lastEntry.insert(Tk.END,"タイトルのテキストを入力")
+        self.lastEntry.insert(Tk.END,"input title")
         self.lastEntry.grid(row = 1, column = 0, columnspan = 1, sticky = Tk.S + Tk.E + Tk.W, padx = 10, pady = 10)
         # self.lastFlamelabel = Tk.LabelFrame(self, bd=2, relief="ridge", text="openning & closing")
         # self.lastFlamelabel.pack(padx=5, pady=5)
@@ -250,7 +257,7 @@ class MainFrame(Tk.Frame):
 
 class App:
 
-    def __init__(self, master, queryPath, candidatePath):
+    def __init__(self, master, queryPath, candidatePath, fullVideoPath):
         # Allows update in later method
         self.master = master
         self.master.title("movie summery")
@@ -264,6 +271,9 @@ class App:
         self.main_canvas = Tk.Canvas(self.master, yscrollcommand=self.y_axis_scrollbar.set, xscrollcommand=self.x_axis_scrollbar.set)
         self.main_canvas.configure(scrollregion=self.main_canvas.bbox('all'))
 
+
+
+
         # Configure and pack/grid scrollbar to master
         self.y_axis_scrollbar.configure(command=self.main_canvas.yview)
         self.y_axis_scrollbar.pack(side=Tk.RIGHT, fill=Tk.Y)
@@ -272,9 +282,13 @@ class App:
         self.x_axis_scrollbar.pack(side=Tk.BOTTOM, fill=Tk.X)
 
         # This is the frame all content will go to. The 'master' of the frame is the canvas
-        self.content_frame = MainFrame(self.main_canvas, queryPath, candidatePath)
+        self.content_frame = MainFrame(self.main_canvas, queryPath, candidatePath, fullVideoPath)
 
         # Place canvas on app pack/grid
+
+
+        #マウスカーソルが乗ったときX軸Y軸スクロールバーをバインド
+
 
 
         # create_window draws the Frame on the canvas. Imagine it as another pack/grid
@@ -284,6 +298,11 @@ class App:
         self.master.grid_rowconfigure(0, weight=0, minsize=0)
         # self.master.grid_rowconfigure(1, weight=1, minsize=0)
 
+        self.y_axis_scrollbar.bind('<MouseWheel>', lambda e:self.main_canvas.yview_scroll(-1*(1 if e.delta>0 else -1),UNITS))
+        self.y_axis_scrollbar.bind('<Enter>',lambda e:self.y_axis_scrollbar.focus_set())
+        self.main_canvas.bind('<Enter>',lambda e:self.y_axis_scrollbar.focus_set())
+        self.x_axis_scrollbar.bind('<MouseWheel>', lambda e:self.main_canvas.xview_scroll(-1*(1 if e.delta>0 else -1),UNITS))
+        self.x_axis_scrollbar.bind('<Enter>',lambda e:self.x_axis_scrollbar.focus_set())
 
         # Call this method after every update to the canvas
         self.update_scroll_region()
@@ -298,18 +317,26 @@ class App:
         print(self.main_canvas.bbox('all'))
 
 
+def fixButtonLabel():
+    a = root.winfo_geometry().split('+')[0]
+    b = a.split('x')
+    w = int(b[0])
+    h = int(b[1])
+    root.geometry('%dx%d' % (w+1,h+1))
+
+
+
 if __name__ == '__main__':
-    with open("query_112.json", "r") as file:
+    fullVideoPath = Path(sys.argv[1])
+
+    with open("[PATH_TO_query.json]", "r") as file:
         queryPath = json.load(file)
 
-    with open("candidate_112.json", "r") as file:
+    with open("[PATH_TO_candidate.json]", "r") as file:
         candidatePath = json.load(file)
-        # -----------------------------
-        # -----------------------------
-        epoch = int(sys.argv[1])
-        candidatePath = candidatePath[epoch]
-        # -----------------------------
-        # -----------------------------
+
+    epoch = random.randint(0, len(candidatePath))
+    candidatePath = candidatePath[epoch]
     paths = glob("*.mp4")
     for path in paths:
         os.remove(path)
@@ -319,6 +346,8 @@ if __name__ == '__main__':
         os.remove("*.srt")
 
     root = Tk.Tk()
-    app = App(root, queryPath, candidatePath)
+    app = App(root, queryPath, candidatePath, fullVideoPath)
+    root.update()
+    root.after(0, fixButtonLabel)
 
     root.mainloop()
