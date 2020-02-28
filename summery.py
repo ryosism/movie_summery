@@ -329,10 +329,10 @@ def fixButtonLabel():
 if __name__ == '__main__':
     fullVideoPath = Path(sys.argv[1])
 
-    with open("015_whole_query.json", "r") as file:
+    with open("[PATH_TO_query.json]", "r") as file:
         queryPath = json.load(file)
 
-    with open("015_merge_candidate_detection_wo100words_noun.json", "r") as file:
+    with open("[PATH_TO_candidate.json]", "r") as file:
         candidatePath = json.load(file)
 
     epoch = random.randint(0, len(candidatePath))
